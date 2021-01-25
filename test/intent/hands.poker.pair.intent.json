@@ -1,0 +1,8 @@
+{
+    "expected_dialog": "hands.poker",
+    "intent": {
+        "combination": "pair"
+    },
+    "intent_type": "hands.poker.intent",
+    "utterance": "what is a pair"
+}
