@@ -5,9 +5,9 @@ Tells you strength of a hand or what a card combination is
 My first skill test to find out how it really works. idea is that it tells you what value your hand has or you can ask what for example flush is (5 cardthe same suit)
 
 ## Examples
-* "What hand is ace ace?"
+* "What hand is ace ace?" - TODO
 * "What is a full house?"
-* "What are the nuts?"
+* "What are the nuts?" - TODO
 
 ## Credits
 Filip Polak
