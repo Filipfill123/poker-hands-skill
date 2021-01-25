@@ -2,7 +2,7 @@
 Tells you strength of a hand or what a card combination is
 
 ## About
-My first skill test to find out how it really works. idea is that it tells you what value your hand has or you can ask what for example flush is (5 cardthe same suit)
+My first skill test to find out how it really works. idea is that it tells you what value your hand has or you can ask what for example flush is (5 cards of the same suit)
 
 ## Examples
 * "What hand is ace ace?" - TODO
