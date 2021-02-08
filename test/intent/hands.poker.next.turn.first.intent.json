@@ -1,0 +1,8 @@
+{
+    "expected_dialog": "hands.poker",
+    "intent": {
+        "first_card": "king"
+    },
+    "intent_type": "first.card.hands.poker.intent",
+    "utterance": "the first card was king"
+}

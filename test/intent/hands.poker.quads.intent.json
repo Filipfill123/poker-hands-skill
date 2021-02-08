@@ -1,8 +1,0 @@
-{
-    "expected_dialog": "hands.poker",
-    "intent": {
-        "combination": "four of a kind"
-    },
-    "intent_type": "hands.poker.intent",
-    "utterance": "what is a four of a kind"
-}

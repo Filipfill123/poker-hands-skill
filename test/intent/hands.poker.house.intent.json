@@ -1,8 +1,0 @@
-{
-    "expected_dialog": "hands.poker",
-    "intent": {
-        "combination": "full house"
-    },
-    "intent_type": "hands.poker.intent",
-    "utterance": "what is a full house"
-}

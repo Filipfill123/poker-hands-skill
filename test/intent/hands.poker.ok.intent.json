@@ -1,8 +1,9 @@
 {
     "expected_dialog": "hands.poker",
     "intent": {
-        "combination": "straight flush"
+        "first_card": "ace",
+	"second_card": "ace"
     },
     "intent_type": "hands.poker.intent",
-    "utterance": "what is a straight flush"
+    "utterance": "what is ace and ace"
 }

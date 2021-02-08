@@ -1,0 +1,9 @@
+{
+    "expected_dialog": "hands.poker.second.wrong",
+    "intent": {
+        "first_card": "ace",
+	"second_card": "wrong"
+    },
+    "intent_type": "hands.poker.intent",
+    "utterance": "what is ace and wrong"
+}

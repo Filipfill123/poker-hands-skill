@@ -72,10 +72,15 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('first.card.hands.poker.intent')
     def handle_first_card_hands_poker(self, message):
+        first_card = message.data.get('first_card')
         if self.STATE_REPRESENTATION[0] is not None:
-            result = f"I already know the first card. It is {self.STATE_REPRESENTATION[0]}. Please, what was the second card?"    
+            result = f"I already know the first card. It is {self.STATE_REPRESENTATION[0]}. Please, what is the second card?"
+            self.speak_dialog('hands.poker', data={"result": result})    
+        elif self.STATE_REPRESENTATION[1] is None and first_card in self.cards:
+            self.STATE_REPRESENTATION[0] = first_card
+            result = f"The first card is {first_card}. What is the second card?"
+            self.speak_dialog('hands.poker', data={"result": result})   
         else:
-            first_card = message.data.get('first_card')
             if first_card not in self.cards:
                 self.speak_dialog('still.no.hands.poker') 
             else:
@@ -91,10 +96,16 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('second.card.hands.poker.intent')
     def handle_second_card_hands_poker(self, message):
+        second_card = message.data.get('second_card')
+
         if self.STATE_REPRESENTATION[1] is not None:
-            result = f"I already know the second card. It is {self.STATE_REPRESENTATION[1]}. Please, what was the first card?"
+            result = f"I already know the second card. It is {self.STATE_REPRESENTATION[1]}. Please, what is the first card?"
+            self.speak_dialog('hands.poker', data={"result": result})
+        elif self.STATE_REPRESENTATION[0] is None and second_card in self.cards:
+            self.STATE_REPRESENTATION[1] = second_card
+            result = f"The second card is {second_card}. What is the first card?"
+            self.speak_dialog('hands.poker', data={"result": result})
         else:    
-            second_card = message.data.get('second_card')
             if second_card not in self.cards:
                 self.speak_dialog('still.no.hands.poker') 
             else:
@@ -107,6 +118,28 @@ class PokerHands(MycroftSkill):
                     result = f"{self.STATE_REPRESENTATION[0]} and {second_card} is not a pair"
                     self.STATE_REPRESENTATION = [None, None]
                     self.speak_dialog('hands.poker', data={"result": result})
+
+    @intent_file_handler('kill.intent')
+    def handle_kill(self, message):
+        if self.STATE_REPRESENTATION[0] is None and self.STATE_REPRESENTATION[1] is None:
+            result = f"Wait a second, your highness. I looked really hard but my state representation seems to be empty already. Please, don't kill me"
+        elif self.STATE_REPRESENTATION[0] is None and self.STATE_REPRESENTATION[1] is not None:
+            result = f"The first card was empty, the second card was {self.STATE_REPRESENTATION[1]}"
+        elif self.STATE_REPRESENTATION[0] is not None and self.STATE_REPRESENTATION[1] is None:
+            result = f"The first card was {self.STATE_REPRESENTATION[0]}, the second card was empty"
+        self.STATE_REPRESENTATION = [None, None]
+        self.speak_dialog('kill', data={"result": result})
+
+    @intent_file_handler('show.intent')
+    def handle_show(self, message):
+        if self.STATE_REPRESENTATION[0] is None and self.STATE_REPRESENTATION[1] is None:
+            result = f"The state representation is empty, my lord"
+        elif self.STATE_REPRESENTATION[0] is None and self.STATE_REPRESENTATION[1] is not None:
+            result = f"The first card is empty, the second card is {self.STATE_REPRESENTATION[1]}"
+        elif self.STATE_REPRESENTATION[0] is not None and self.STATE_REPRESENTATION[1] is None:
+            result = f"The first card is {self.STATE_REPRESENTATION[0]}, the second card is empty"
+        self.speak_dialog('show', data={"result": result})
+
 
 def create_skill():
     return PokerHands()

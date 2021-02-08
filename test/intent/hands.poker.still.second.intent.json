@@ -1,0 +1,8 @@
+{
+    "expected_dialog": "still.no.hands.poker",
+    "intent": {
+        "second_card": "wrong"
+    },
+    "intent_type": "second.card.hands.poker.intent",
+    "utterance": "the second card was wrong"
+}
