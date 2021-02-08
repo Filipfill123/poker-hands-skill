@@ -62,7 +62,7 @@ class PokerHands(MycroftSkill):
         else:
             self.STATE_REPRESENTATION = [first_card, second_card]
             if first_card == second_card:
-                result = f"it is a pair of {first_card}"
+                result = f"it is a pair of {first_card}s"
                 self.STATE_REPRESENTATION = [None, None]
                 self.speak_dialog('hands.poker', data={"result": result})
             else:
@@ -71,36 +71,42 @@ class PokerHands(MycroftSkill):
                 self.speak_dialog('hands.poker', data={"result": result})
 
     @intent_file_handler('first.card.hands.poker.intent')
-    def handle_first_card_hands_poker(self, message):    
-        first_card = message.data.get('first_card')
-        if first_card not in self.cards:
-           self.speak_dialog('still.no.hands.poker') 
+    def handle_first_card_hands_poker(self, message):
+        if self.STATE_REPRESENTATION[0] is not None:
+            result = f"I already know the first card. It is {self.STATE_REPRESENTATION[0]}. Please, what was the second card?"    
         else:
-            self.STATE_REPRESENTATION[0] = first_card
-            if first_card == self.STATE_REPRESENTATION[1]:
-                result = f"it is a pair of {first_card}"
-                self.STATE_REPRESENTATION = [None, None]
-                self.speak_dialog('hands.poker', data={"result": result})
+            first_card = message.data.get('first_card')
+            if first_card not in self.cards:
+                self.speak_dialog('still.no.hands.poker') 
             else:
-                result = f"{first_card} and {self.STATE_REPRESENTATION[1]} is not a pair"
-                self.STATE_REPRESENTATION = [None, None]
-                self.speak_dialog('hands.poker', data={"result": result})
+                self.STATE_REPRESENTATION[0] = first_card
+                if first_card == self.STATE_REPRESENTATION[1]:
+                    result = f"it is a pair of {first_card}s"
+                    self.STATE_REPRESENTATION = [None, None]
+                    self.speak_dialog('hands.poker', data={"result": result})
+                else:
+                    result = f"{first_card} and {self.STATE_REPRESENTATION[1]} is not a pair"
+                    self.STATE_REPRESENTATION = [None, None]
+                    self.speak_dialog('hands.poker', data={"result": result})
 
     @intent_file_handler('second.card.hands.poker.intent')
-    def handle_second_card_hands_poker(self, message):    
-        second_card = message.data.get('second_card')
-        if second_card not in self.cards:
-           self.speak_dialog('still.no.hands.poker') 
-        else:
-            self.STATE_REPRESENTATION[1] = second_card
-            if self.STATE_REPRESENTATION[0] == second_card:
-                result = f"it is a pair of {self.STATE_REPRESENTATION[0]}"
-                self.STATE_REPRESENTATION = [None, None]
-                self.speak_dialog('hands.poker', data={"result": result})
+    def handle_second_card_hands_poker(self, message):
+        if self.STATE_REPRESENTATION[1] is not None:
+            result = f"I already know the second card. It is {self.STATE_REPRESENTATION[1]}. Please, what was the first card?"
+        else:    
+            second_card = message.data.get('second_card')
+            if second_card not in self.cards:
+                self.speak_dialog('still.no.hands.poker') 
             else:
-                result = f"{self.STATE_REPRESENTATION[0]} and {second_card} is not a pair"
-                self.STATE_REPRESENTATION = [None, None]
-                self.speak_dialog('hands.poker', data={"result": result})
+                self.STATE_REPRESENTATION[1] = second_card
+                if self.STATE_REPRESENTATION[0] == second_card:
+                    result = f"it is a pair of {self.STATE_REPRESENTATION[0]}s"
+                    self.STATE_REPRESENTATION = [None, None]
+                    self.speak_dialog('hands.poker', data={"result": result})
+                else:
+                    result = f"{self.STATE_REPRESENTATION[0]} and {second_card} is not a pair"
+                    self.STATE_REPRESENTATION = [None, None]
+                    self.speak_dialog('hands.poker', data={"result": result})
 
 def create_skill():
     return PokerHands()
