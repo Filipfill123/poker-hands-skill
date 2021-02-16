@@ -1,18 +1,16 @@
 from mycroft import MycroftSkill, intent_file_handler
-from StateRepresenation_test import StateRepresentation
 
 
 class PokerHands(MycroftSkill):
     def __init__(self):
         self.skill_name = "poker_hands"
-        self.no_of_slates = 2
-        self.compulsory_slates = 2
-        self.possible_outcomes = = ["no_pair", "in_progress", "pair"]
-        self.STATE_REPRESENTATION = StateRepresentation(self.skill_name, self.no_of_slates, self.compulsory_slates, self.possible_outcomes)
+        self.STATE_REPRESENTATION = {'user': self.skill_name,'agent': {"first_card":[None,None],"second_card":[None,None]},'task': "in_progress"}
         # STATE_REPRESENTATION should be connection of user's intention + agent's state + task being "worked on"
         # states of task - ["in_progress" - in progress (the task is being worked on), "pair" - it's a pair, "no_pair" - it's not a pair]
         # states of slots - first value - card (if None, not understood or not answered yet), second value = [None - empty, "not_confirmed" - not confirmed, "confirmed" - confirmed, "inconsistent" - more than one value for slot]
                                                                         
+
+        
         self.cards = ('ace','king','queen','jack','ten','nine','eight','seven','six','five','four','three','two')
         MycroftSkill.__init__(self)
 
@@ -26,20 +24,18 @@ class PokerHands(MycroftSkill):
             self.speak_dialog('hands.poker.all.wrong')
         
         elif (first_card not in self.cards) and (second_card in self.cards): # first card was misunderstood
-            self.STATE_REPRESENTATION.set_card_not_cofirmed(second_card,2)
-            # self.STATE_REPRESENTATION['agent']['second_card'] = [second_card,"not_confirmed"] # the first card stays None
+
+            self.STATE_REPRESENTATION['agent']['second_card'] = [second_card,"not_confirmed"] # the first card stays None
             self.speak_dialog('hands.poker.first.wrong', data={"second_card": second_card})
         
         elif (first_card in self.cards) and (second_card not in self.cards): # second card was misunderstood
-            self.STATE_REPRESENTATION.set_card_not_cofirmed(first_card,1)
-            # self.STATE_REPRESENTATION['agent']['first_card'] = [first_card, "not_confirmed"] # the second card stays None
+
+            self.STATE_REPRESENTATION['agent']['first_card'] = [first_card, "not_confirmed"] # the second card stays None
             self.speak_dialog('hands.poker.second.wrong', data={"first_card": first_card})
         
         else:
-            self.STATE_REPRESENTATION.set_card_not_cofirmed(first_card,1)
-            self.STATE_REPRESENTATION.set_card_not_cofirmed(second_card,2)
-            # self.STATE_REPRESENTATION['agent']['first_card'] = [first_card, "not_confirmed"]
-            # self.STATE_REPRESENTATION['agent']['second_card'] = [second_card,"not_confirmed"]
+            self.STATE_REPRESENTATION['agent']['first_card'] = [first_card, "not_confirmed"]
+            self.STATE_REPRESENTATION['agent']['second_card'] = [second_card,"not_confirmed"]
             self.speak_dialog('confirm.cards',data={'first_card':first_card, 'second_card':second_card})
             
     @intent_file_handler('first.card.hands.poker.intent')
@@ -172,5 +168,4 @@ class PokerHands(MycroftSkill):
 
 def create_skill():
     return PokerHands()
-
 
