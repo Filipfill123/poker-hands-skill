@@ -8,11 +8,12 @@
 #### 2) fill slate with both UNCONFIRMED cards ( 1) and 2) SET FUNCTIONS)
 #### 3) GET FUNCTIONS for both cards
 #### 4) SET FUNCTIONS for CONFIRMED (alternatively change card/s and CONFIRM it/them)
+#### 5) DELETE state representation
 
 class StateRepresentation:
     def __init__(self, skill_name, no_of_slates, compulsory_slates, possible_outcomes):
         # possible_outcomes = ["no_pair", "in_progress", "pair"]
-        task_state = possible_outcomes[1]
+        task_state = possible_outcomes[1] # -> only three outcomes - no_pair, in_progress, pair (for simplicity as -1 0 1, hence 0 1 2)
         state_representation = {'user': skill_name,'agent': {},'task': task_state}
         for i in range(no_of_slates):
             state_representation["agent"][f"card_{i+1}"] = [None,None,"compulsory"]
@@ -45,7 +46,9 @@ class StateRepresentation:
     def set_outcome_no_pair(self):
         self.STATE_REPRESENTATION["agent"]["task"] = "no_pair"
     
-    
+    def delete_state_representation(self):
+        for i in range(self.no_of_slates):
+            self.STATE_REPRESENTATION["agent"][f"card_{i+1}"] = [None, None, "compulsory"]
     # def set_both_cards_not_confirmed(self, card_values): -> probably unnecessary
 
     
