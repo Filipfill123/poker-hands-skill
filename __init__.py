@@ -1,5 +1,5 @@
 from mycroft import MycroftSkill, intent_file_handler
-from StateRepresenation_test import StateRepresentation
+from StateRepresenation import StateRepresentation
 import datetime
 
 
