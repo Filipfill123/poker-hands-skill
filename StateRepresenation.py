@@ -1,14 +1,3 @@
-#### we need state representation initialization:
-#### 1) we need states for user intention, 2) task progress
-#### 3) we need to know which slates of agent's state are compulsory etc. and the numbers of slates
-
-
-#### functions:
-#### 1) fill slate with either the first UNCONFIRMED card or the second UNCONFIRMED
-#### 2) fill slate with both UNCONFIRMED cards ( 1) and 2) SET FUNCTIONS)
-#### 3) GET FUNCTIONS for both cards
-#### 4) SET FUNCTIONS for CONFIRMED (alternatively change card/s and CONFIRM it/them)
-#### 5) DELETE state representation
 
 class StateRepresentation:
     def __init__(self, skill_name, no_of_slates, is_confidence_score):
@@ -20,7 +9,7 @@ class StateRepresentation:
         state_representation = {'user': skill_name,'agent': {},'task': "in_progress"}
         if is_confidence_score:
             for i in range(no_of_slates):
-                state_representation["agent"][f"slot_{i+1}"] = [[None, None],None] # [[ace,0.9], "not_confirmed"]
+                state_representation["agent"][f"slot_{i+1}"] = [[[None, None]],None] # [[[ace,0.9],[king,0.2],...], "not_confirmed"]
         else:
             for i in range(no_of_slates):
                 state_representation["agent"][f"slot_{i+1}"] = [None,None] # [ace, "not_confirmed"]
@@ -34,7 +23,7 @@ class StateRepresentation:
     """
     def get_slot_value(self, which_slot):
         """
-        For getting value of a specific slot = to be used if there are no unconsistencies, thus no confidence score
+        For getting value of a specific slot = to be used if there are no inconsistencies, thus no confidence score
 
         Args: number of slot to get
         
@@ -46,9 +35,9 @@ class StateRepresentation:
 
     def get_all_slots_value(self): 
         """
-        For getting value of all slots = to be used if there are no unconsistencies, thus no confidence score
+        For getting value of all slots = to be used if there are no inconsistencies, thus no confidence score
         
-        Returns: array of values for all slots ([ace, king]) 
+        Returns: array of values for all slots ([ace, king,...]) for slot_1 and slot_2,...
         """
         slots_value = list()
         for i in range(self.no_of_slates):
@@ -56,9 +45,22 @@ class StateRepresentation:
         return slots_value
 
 
+    def get_all_not_confirmed_slots(self):
+        """
+        For getting all uncofirmed slots = to be used if there are no inconsistencies, thus no confidence score
+
+        Returns: array of arrays [[1, "ace"], [4, "two",0.87],...] = [[which_slot_is_not_confirmed, slot_value],...] 
+        """
+        uncofirmed_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "not_confirmed":
+                uncofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0]])
+        return uncofirmed_slots
+
+
     def set_slot_value_not_cofirmed(self, slot_value, which_slot):
         """
-        For setting an unconfirmed value to a slot = to be used if there are no unconsistencies, thus no confidence score
+        For setting an unconfirmed value to a slot = to be used if there are no inconsistencies, thus no confidence score
 
         Args: value to set, number of slot
         
@@ -68,12 +70,13 @@ class StateRepresentation:
 
     def set_slot_cofirmed(self, which_slot):
         """
-        For "switching"/setting a slot to a confirmed state  = to be used if there are no unconsistencies, thus no confidence score
+        For "switching"/setting a slot to a confirmed state  = to be used if there are no inconsistencies, thus no confidence score
 
         Args: which slot to confirm
         """
         self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][1] = "confirmed"
     
+
     def delete_state_representation(self):
         """
         Deletes all of agent's memory - primarely for debugging purposes
@@ -88,53 +91,85 @@ class StateRepresentation:
 
     def get_slot_value_with_confidence(self, which_slot):
         """
-        For getting value of a specific slot and its confidence score = to be used if there are unconsistencies, thus with confidence score
+        For getting value of a specific slot and its confidence score = to be used if there are inconsistencies, thus with confidence score
 
         Args: number of slot to get
         
-        Returns: value of a specific slot and its confidence
+        Returns: value of a specific slot
         """
-        slot_value = self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0]
+        slot_value = self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0][0][0]
         return slot_value
+
 
     def get_all_slot_values(self, which_slot):
         """
-        For getting all values of one slot and their confidence scores = to be used if there are unconsistencies, thus with confidence score
+        For getting all values of one slot and their confidence scores = to be used if there are inconsistencies, thus with confidence score
 
         Args: number of slot to get
 
         Returns: array of arrays [[ace,0.9],[king,0.3],[two,0.05]] = [[value_1, confidence_score_1],[value_2, confidence_score_2],...]
 
         """
-        slot_values = list()
-        for i in range(len(self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0])):
-            slot_values.append(self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0][i])
+        slot_values = self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0]
         return slot_values
+
+
+    def get_all_not_confirmed_slots_with_confidence(self):
+        """
+        For getting all uncofirmed slots = to be used if there are inconsistencies, thus with confidence score
+
+        Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_not_confirmed, [slot_value, confidence_score]],...] 
+        """
+        uncofirmed_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "not_confirmed":
+                uncofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0][0]])
+        return uncofirmed_slots
+
+    def get_all_inconsistent_slots_with_confidence(self):
+        """
+        For getting all inconsistent slots = to be used if there are inconsistencies, thus with confidence score
+
+        Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_not_confirmed, [[slot_value_1, confidence_score_1], [slot_value_2, confidence_score_2]]],...] 
+        """
+        inconsistent_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "inconsistent":
+                inconsistent_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0]])
+        return inconsistent_slots
 
     def set_slot_value_not_cofirmed_with_confidence(self, slot_value, confidence_score, which_slot):
         """
-        For setting an unconfirmed value and its confidence to a slot = to be used if there are unconsistencies, thus with confidence score
+        For setting an unconfirmed value and its confidence to a slot = to be used if there are inconsistencies, thus with confidence score
+        Also appends a new value and its confidence to a slot, sorts the whole slot from most confident to least and sets slot as "inconsistent"
 
         Args: value, confidence score, number of slot  
         
         """
-        self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"] = [[slot_value,confidence_score],"not_confirmed"]
+        if self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0][0][0] is None and self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][1] is None:
+            self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"] = [[[slot_value,confidence_score]],"not_confirmed"]
+
+        else:
+            self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0].append([slot_value, confidence_score])
+            self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][0].sort(key=lambda x: x[1], reverse=True)
+            self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][1] = "inconsistent"
 
 
     def set_slot_cofirmed_with_confidence(self, which_slot): # function without confidence could also be used
         """
-        For "switching"/setting a slot to a confirmed state  = to be used if there are unconsistencies, thus with confidence score
+        For "switching"/setting a slot to a confirmed state  = to be used if there are inconsistencies, thus with confidence score
 
         Args: which slot to confirm
         """
         self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][1] = "confirmed"
     
+
     def delete_state_representation_with_confidence(self):
         """
         Deletes all of agent's memory - primarely for debugging purposes
         """
         for i in range(self.no_of_slates):
-            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"] = [[None, None], None]
+            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"] = [[[None, None]], None]
 
 
     """
@@ -144,21 +179,32 @@ class StateRepresentation:
         """
         For getting state of task
 
-        Returns: state of task
+        Returns: (str) state of task
         """
         task_state = self.STATE_REPRESENTATION["task"]
 
         return task_state
 
+
     def get_user_state(self):
         """
         For getting state of user
 
-        Returns: state of user
+        Returns: (str) state of user
         """
         user_state = self.STATE_REPRESENTATION["user"]
         
         return user_state
+
+
+    def set_task_state(self, task_state):
+        """
+        For setting a task state
+
+        Args: the task state to be set
+        """
+        self.STATE_REPRESENTATION["task"] = task_state
+
 
     def set_user_state(self, user_state):
         """
@@ -168,13 +214,16 @@ class StateRepresentation:
         """
         self.STATE_REPRESENTATION["user"] = user_state
 
-    def set_task_state(self, task_state):
-        """
-        For setting a task state
 
-        Args: the task state to be set
-        """
-        self.STATE_REPRESENTATION["task"] = task_state
+if __name__ == "__main__":
+    state_repres = StateRepresentation("test", 3, True)
+    state_repres.set_slot_value_not_cofirmed_with_confidence("karta",0.8, 1)
+    #state_repres.set_slot_value_not_cofirmed_with_confidence("prdel",0.2, 1)
+    #state_repres.set_slot_value_not_cofirmed_with_confidence("kundibad",20, 1)
+    state_repres.set_slot_value_not_cofirmed_with_confidence("karta",0.8, 3)
+    #state_repres.set_slot_value_not_cofirmed_with_confidence("prdel",0.2, 3)
+    #state_repres.set_slot_value_not_cofirmed_with_confidence("kundibad",20, 3)
+    print(state_repres.get_all_inconsistent_slots_with_confidence())
 
     
 
