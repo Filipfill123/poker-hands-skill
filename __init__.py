@@ -83,21 +83,17 @@ class PokerHands(MycroftSkill):
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
             result = f"it is a pair of {self.STATE_REPRESENTATION.get_slot_value(1)}s"
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
-            
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
-            
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.get_slot_value(1)} and {self.STATE_REPRESENTATION.get_slot_value(2)} is not a pair"
-
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
-
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
     
     @intent_file_handler('confirm.first.card.intent')
@@ -110,20 +106,17 @@ class PokerHands(MycroftSkill):
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
             result = f"it is a pair of {self.STATE_REPRESENTATION.get_slot_value(1)}s"
-
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
-
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.get_slot_value(1)} and {self.STATE_REPRESENTATION.get_slot_value(2)} is not a pair"
-
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
 
     @intent_file_handler('confirm.second.card.intent')
@@ -136,21 +129,19 @@ class PokerHands(MycroftSkill):
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
             result = f"it is a pair of {self.STATE_REPRESENTATION.get_slot_value(1)}s"
-
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
-            
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.get_slot_value(1)} and {self.STATE_REPRESENTATION.get_slot_value(2)} is not a pair"
 
-            self.STATE_REPRESENTATION.delete_state_representation()
-            self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
             
+            self.STATE_REPRESENTATION.set_task_state("no_pair")
+            with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()} \n")
+            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
     
     @intent_file_handler('confirm.no.cards.intent')
