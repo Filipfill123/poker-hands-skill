@@ -49,13 +49,38 @@ class StateRepresentation:
         """
         For getting all uncofirmed slots = to be used if there are no inconsistencies, thus no confidence score
 
-        Returns: array of arrays [[1, "ace"], [4, "two",0.87],...] = [[which_slot_is_not_confirmed, slot_value],...] 
+        Returns: array of arrays [[1, "ace"], [4, "two"],...] = [[which_slot_is_not_confirmed, slot_value],...] 
         """
         uncofirmed_slots = list()
         for i in range(len(self.STATE_REPRESENTATION["agent"])):
             if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "not_confirmed":
                 uncofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0]])
         return uncofirmed_slots
+
+    def get_all_confirmed_slots(self):
+        """
+        For getting all cofirmed slots = to be used if there are no inconsistencies, thus no confidence score
+
+        Returns: array of arrays [[1, "ace"], [4, "two"],...] = [[which_slot_is_confirmed, slot_value],...] 
+        """
+        cofirmed_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "confirmed":
+                cofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0]])
+        return cofirmed_slots
+
+
+    def get_all_empty_slots(self):
+        """
+        For getting all empty slots = to be used if there are no inconsistencies, thus no confidence score
+
+        Returns: array of number of empty slots [1, 4, 7,...]
+        """
+        empty_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0] is None:
+                empty_slots.append(i+1)
+        return empty_slots
 
 
     def set_slot_value_not_cofirmed(self, slot_value, which_slot):
@@ -78,6 +103,16 @@ class StateRepresentation:
     
 
     def delete_state_representation(self):
+        """
+        Deletes the whole state representation - primarely for debugging purposes
+        """
+        self.STATE_REPRESENTATION["user"] = None
+        self.STATE_REPRESENTATION["task"] = None
+        for i in range(self.no_of_slates):
+            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"] = [None, None]
+
+
+    def delete_agent_representation(self):
         """
         Deletes all of agent's memory - primarely for debugging purposes
         """
@@ -126,17 +161,42 @@ class StateRepresentation:
                 uncofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0][0]])
         return uncofirmed_slots
 
+    def get_all_confirmed_slots_with_confidence(self):
+        """
+        For getting all cofirmed slots = to be used if there are inconsistencies, thus with confidence score
+
+        Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_confirmed, [slot_value, confidence_score]],...] 
+        """
+        cofirmed_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "confirmed":
+                cofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0][0]])
+        return cofirmed_slots
+
     def get_all_inconsistent_slots_with_confidence(self):
         """
         For getting all inconsistent slots = to be used if there are inconsistencies, thus with confidence score
 
-        Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_not_confirmed, [[slot_value_1, confidence_score_1], [slot_value_2, confidence_score_2]]],...] 
+        Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_inconsistent, [[slot_value_1, confidence_score_1], [slot_value_2, confidence_score_2]]],...] 
         """
         inconsistent_slots = list()
         for i in range(len(self.STATE_REPRESENTATION["agent"])):
             if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][1] == "inconsistent":
                 inconsistent_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0]])
         return inconsistent_slots
+
+
+    def get_all_empty_slots_with_confidence(self):
+        """
+        For getting all empty slots = to be used if there are inconsistencies, thus with confidence score
+
+        Returns: array of number of empty slots [1, 5, 7,...]
+        """
+        empty_slots = list()
+        for i in range(len(self.STATE_REPRESENTATION["agent"])):
+            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"][0][0][0] is None:
+                empty_slots.append(i+1)
+        return empty_slots
 
     def set_slot_value_not_cofirmed_with_confidence(self, slot_value, confidence_score, which_slot):
         """
@@ -164,10 +224,19 @@ class StateRepresentation:
         self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"][1] = "confirmed"
     
 
-    def delete_state_representation_with_confidence(self):
+    def delete_agent_representation_with_confidence(self):
         """
         Deletes all of agent's memory - primarely for debugging purposes
         """
+        for i in range(self.no_of_slates):
+            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"] = [[[None, None]], None]
+
+    def delete_state_representation_with_confidence(self):
+        """
+        Deletes the whole state representation - primarely for debugging purposes
+        """
+        self.STATE_REPRESENTATION["user"] = None
+        self.STATE_REPRESENTATION["task"] = None
         for i in range(self.no_of_slates):
             self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"] = [[[None, None]], None]
 
@@ -220,10 +289,10 @@ if __name__ == "__main__":
     state_repres.set_slot_value_not_cofirmed_with_confidence("karta",0.8, 1)
     #state_repres.set_slot_value_not_cofirmed_with_confidence("prdel",0.2, 1)
     #state_repres.set_slot_value_not_cofirmed_with_confidence("kundibad",20, 1)
-    state_repres.set_slot_value_not_cofirmed_with_confidence("karta",0.8, 3)
+    #state_repres.set_slot_value_not_cofirmed_with_confidence("karta",0.8, 3)
     #state_repres.set_slot_value_not_cofirmed_with_confidence("prdel",0.2, 3)
     #state_repres.set_slot_value_not_cofirmed_with_confidence("kundibad",20, 3)
-    print(state_repres.get_all_inconsistent_slots_with_confidence())
+    print(state_repres.get_all_not_confirmed_slots_with_confidence())
 
     
 

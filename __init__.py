@@ -1,4 +1,6 @@
 from mycroft import MycroftSkill, intent_file_handler
+import sys
+sys.path.append('/opt/mycroft/skills/poker-hands-skill')
 from StateRepresenation import StateRepresentation
 import datetime
 
@@ -60,7 +62,7 @@ class PokerHands(MycroftSkill):
         if self.STATE_REPRESENTATION.get_slot_value(2) is not None:
             result = f"I already know the second card. It is {self.STATE_REPRESENTATION.get_slot_value(2)}. Please, what is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
-        elif self.STATE_REPRESENTATION.get_slot_value(1) and second_card in self.cards:
+        elif self.STATE_REPRESENTATION.get_slot_value(1) is None and second_card in self.cards:
             self.STATE_REPRESENTATION.set_slot_value_not_cofirmed(second_card, 2)
             result = f"The second card is {second_card}. What is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
@@ -84,7 +86,7 @@ class PokerHands(MycroftSkill):
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
             
-            with open("logs/log.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
             
             self.speak_dialog('hands.poker', data={"result": result})
@@ -93,7 +95,7 @@ class PokerHands(MycroftSkill):
 
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("logs/log.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
 
             self.speak_dialog('hands.poker', data={"result": result})
@@ -111,7 +113,7 @@ class PokerHands(MycroftSkill):
 
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
-            with open("logs/log.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
 
             self.speak_dialog('hands.poker', data={"result": result})
@@ -120,7 +122,7 @@ class PokerHands(MycroftSkill):
 
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("logs/log.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
             self.speak_dialog('hands.poker', data={"result": result})
 
@@ -137,7 +139,7 @@ class PokerHands(MycroftSkill):
 
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("pair")
-            with open("logs/log.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
             
             self.speak_dialog('hands.poker', data={"result": result})
@@ -146,7 +148,7 @@ class PokerHands(MycroftSkill):
 
             self.STATE_REPRESENTATION.delete_state_representation()
             self.STATE_REPRESENTATION.set_task_state("no_pair")
-            with open("logs/logg.txt", "w") as logging:
+            with open("log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.get_slot_value(1)} + {self.STATE_REPRESENTATION.get_slot_value(2)} = {self.STATE_REPRESENTATION.get_task_state()}")
             
             self.speak_dialog('hands.poker', data={"result": result})
@@ -165,6 +167,8 @@ class PokerHands(MycroftSkill):
             result = f"The first card was empty, the second card was {self.STATE_REPRESENTATION.get_slot_value(2)}"
         elif self.STATE_REPRESENTATION.get_slot_value(1) is not None and self.STATE_REPRESENTATION.get_slot_value(2) is None:    
             result = f"The first card was {self.STATE_REPRESENTATION.get_slot_value(1)}, the second card was empty"
+        elif self.STATE_REPRESENTATION.get_slot_value(1) is not None and self.STATE_REPRESENTATION.get_slot_value(2) is not None:    
+            result = f"The first card was {self.STATE_REPRESENTATION.get_slot_value(1)}, the second card was {self.STATE_REPRESENTATION.get_slot_value(2)}"
         self.STATE_REPRESENTATION.delete_state_representation()
 
         self.speak_dialog('kill', data={"result": result})
@@ -177,6 +181,8 @@ class PokerHands(MycroftSkill):
             result = f"The first card is empty, the second card is {self.STATE_REPRESENTATION.get_slot_value(2)}"
         elif self.STATE_REPRESENTATION.get_slot_value(1) is not None and self.STATE_REPRESENTATION.get_slot_value(2) is None:    
             result = f"The first card is {self.STATE_REPRESENTATION.get_slot_value(1)}, the second card is empty"
+        elif self.STATE_REPRESENTATION.get_slot_value(1) is not None and self.STATE_REPRESENTATION.get_slot_value(2) is not None:    
+            result = f"The first card is {self.STATE_REPRESENTATION.get_slot_value(1)}, the second card is {self.STATE_REPRESENTATION.get_slot_value(2)}"
 
         self.speak_dialog('show', data={"result": result})
 
