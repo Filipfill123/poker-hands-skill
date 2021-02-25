@@ -27,16 +27,16 @@ class PokerHands(MycroftSkill):
             self.speak_dialog('hands.poker.all.wrong')
         
         elif (first_card not in self.cards) and (second_card in self.cards): # first card was misunderstood
-            self.STATE_REPRESENTATION.set_slot_value(second_card,2)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(second_card, 1.0, 2)
             self.speak_dialog('hands.poker.first.wrong', data={"second_card": second_card})
         
         elif (first_card in self.cards) and (second_card not in self.cards): # second card was misunderstood
-            self.STATE_REPRESENTATION.set_slot_value(first_card,1)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(first_card, 1.0, 1)
             self.speak_dialog('hands.poker.second.wrong', data={"first_card": first_card})
         
         else:
-            self.STATE_REPRESENTATION.set_slot_value(first_card, 1)
-            self.STATE_REPRESENTATION.set_slot_value(second_card, 2)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(first_card, 1.0, 1)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(second_card, 1.0, 2)
             self.speak_dialog('confirm.cards',data={'first_card':first_card, 'second_card':second_card})
             
     @intent_file_handler('first.card.hands.poker.intent')
@@ -46,14 +46,14 @@ class PokerHands(MycroftSkill):
             result = f"I already know the first card. It is {self.STATE_REPRESENTATION.get_slot_value(1)}. Please, what is the second card?"
             self.speak_dialog('hands.poker', data={"result": result})
         elif self.STATE_REPRESENTATION.get_slot_value(2) is None and first_card in self.cards:    
-            self.STATE_REPRESENTATION.set_slot_value(first_card, 1)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(first_card, 1.0, 1)
             result = f"The first card is {first_card}. What is the second card?"
             self.speak_dialog('hands.poker', data={"result": result})   
         else:
             if first_card not in self.cards:
                 self.speak_dialog('notunderstood.hands.poker',data={'which_card': "first card"}) 
             else:
-                self.STATE_REPRESENTATION.set_slot_value(first_card, 1)
+                self.STATE_REPRESENTATION.set_slot_value_confidence(first_card, 1.0, 1)
                 self.speak_dialog('confirm.cards',data={'first_card':first_card, 'second_card':self.STATE_REPRESENTATION.get_slot_value(2)})
 
     @intent_file_handler('second.card.hands.poker.intent')
@@ -63,22 +63,22 @@ class PokerHands(MycroftSkill):
             result = f"I already know the second card. It is {self.STATE_REPRESENTATION.get_slot_value(2)}. Please, what is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
         elif self.STATE_REPRESENTATION.get_slot_value(1) is None and second_card in self.cards:
-            self.STATE_REPRESENTATION.set_slot_value(second_card, 2)
+            self.STATE_REPRESENTATION.set_slot_value_confidence(second_card, 1.0, 2)
             result = f"The second card is {second_card}. What is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
         else:    
             if second_card not in self.cards:
                 self.speak_dialog('notunderstood.hands.poker',data={'which_card': "second card"}) 
             else:
-                self.STATE_REPRESENTATION.set_slot_value(second_card, 2)
+                self.STATE_REPRESENTATION.set_slot_value_confidence(second_card, 1.0, 2)
                 
                 self.speak_dialog('confirm.cards',data={'first_card':self.STATE_REPRESENTATION.get_slot_value(1), 'second_card':second_card})
 
 
     @intent_file_handler('confirm.both.cards.intent')
     def handle_confirm_both_cards_intent(self, message):
-        self.STATE_REPRESENTATION.set_slot_cofirmed(1)
-        self.STATE_REPRESENTATION.set_slot_cofirmed(2)
+        self.STATE_REPRESENTATION.set_slot_confirmed(1)
+        self.STATE_REPRESENTATION.set_slot_confirmed(2)
         time = datetime.datetime.now()
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
@@ -98,10 +98,10 @@ class PokerHands(MycroftSkill):
     
     @intent_file_handler('confirm.first.card.intent')
     def handle_confirm_first_card_intent(self, message):
-        self.STATE_REPRESENTATION.set_slot_cofirmed(1)
+        self.STATE_REPRESENTATION.set_slot_confirmed(1)
         second_card = message.data.get('second_card')
-        self.STATE_REPRESENTATION.set_slot_value(second_card, 2)
-        self.STATE_REPRESENTATION.set_slot_cofirmed(2)
+        self.STATE_REPRESENTATION.set_slot_value_confidence(second_card, 1.0, 2)
+        self.STATE_REPRESENTATION.set_slot_confirmed(2)
         time = datetime.datetime.now()
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
@@ -121,10 +121,10 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('confirm.second.card.intent')
     def handle_confirm_second_card_intent(self, message):
-        self.STATE_REPRESENTATION.set_slot_cofirmed(2)
+        self.STATE_REPRESENTATION.set_slot_confirmed(2)
         first_card = message.data.get('first_card')
-        self.STATE_REPRESENTATION.set_slot_value(first_card, 1)
-        self.STATE_REPRESENTATION.set_slot_cofirmed(1)
+        self.STATE_REPRESENTATION.set_slot_value_confidence(first_card, 1.0, 1)
+        self.STATE_REPRESENTATION.set_slot_confirmed(1)
         time = datetime.datetime.now()
 
         if self.STATE_REPRESENTATION.get_slot_value(1) == self.STATE_REPRESENTATION.get_slot_value(2):
