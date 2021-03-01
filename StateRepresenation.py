@@ -1,4 +1,4 @@
-
+from pyrsistent import v, pvector
 class StateRepresentation:
     
     def __init__(self):
@@ -11,16 +11,23 @@ class StateRepresentation:
         
         self.TaskSlot = TaskSlot()
         self.UserSlot = UserSlot()
-        self.AgentSlots = []
+        self.AgentSlots = v()
+        self.Memory = list()
         
     """
     Agent functions
     """
     def insert_agent_slot(self, name, slot_state, slot_value, slot_confidence):
-        self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
+        self.Memory.append(self.AgentSlots)
+        self.AgentSlots = self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
+
+    def replace_agent_slot(self, which_slot, name, slot_state, slot_value, slot_confidence):
+        self.Memory.append(self.AgentSlots)
+        self.AgentSlots = self.AgentSlots.set(which_slot)
 
     def remove_agent_slot(self, which_slot):
-        self.AgentSlots.pop(which_slot)
+        self.Memory.append(self.AgentSlots)
+        self.AgentSlots = self.AgentSlots.delete(which_slot)
 
     def print_agent_names(self):
         names = []
@@ -106,7 +113,7 @@ class StateRepresentation:
         return empty_slots
 
 
-    def set_slot_value_confidence(self, slot_value, slot_confidence, which_slot):
+    def set_slot_value_confidence(self, which_slot, slot_value, slot_confidence):
         """
         For setting an unconfirmed value to a slot
         Args: value to set, number of slot
@@ -189,7 +196,7 @@ class StateRepresentation:
         """
         self.UserSlot.set_user_state_slot(None)
         self.TaskSlot.set_task_state_slot(None)
-        self.AgentSlots = []
+        self.AgentSlots = v()
             
 
 
@@ -257,11 +264,17 @@ if __name__ == "__main__":
 
 
     STATE_REPRESENTATION.insert_agent_slot("kundibad", "not_confirmed", "test", 0.0)
-    #STATE_REPRESENTATION.insert_agent_slot("dement", "not_confirmed", "test_2", 0.9)
-    STATE_REPRESENTATION.set_slot_value_confidence("test_800", 0.1, 0)
-    #print(STATE_REPRESENTATION.get_all_inconsistent_slots())
-    print(STATE_REPRESENTATION.get_slot_value(0, 1))
-    print(STATE_REPRESENTATION.get_all_slot_values(0))
-    #AgentSlot = AgentSlot("prdel", "kunda", "test", 1.0)
-    #AgentSlot.set_slot_value_confidence_slot("nevim", 0.1)
-    #print(AgentSlot.get_slot_value_slot(1))
+    STATE_REPRESENTATION.insert_agent_slot("dement", "not_confirmed", "test_2", 0.9)
+    print(STATE_REPRESENTATION.AgentSlots)
+    print(STATE_REPRESENTATION.Memory)
+    STATE_REPRESENTATION.remove_agent_slot(0)
+    print(STATE_REPRESENTATION.AgentSlots)
+    print(STATE_REPRESENTATION.Memory)
+    
+    # seznam = list()
+    # vector = v(1,2,3)
+    # v1 = vector.delete(0)
+    # print(v1)
+    # seznam.append(vector)
+    # seznam.append(v1)
+    # print(seznam)
