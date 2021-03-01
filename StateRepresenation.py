@@ -1,20 +1,34 @@
 
 class StateRepresentation:
-    def __init__(self, skill_name, no_of_slates):
+    
+    def __init__(self):
         """
         Initialization of STATE REPRESENTATION
-
-        Args: user's intent, number of slates (probably should be dynamic somehow)
+        TaskSlot for task's state
+        UserSlot for user's state
+        AgentSlots for agent's slots
         """
-        state_representation = {'user': UserSlot(),'agent': {},'task': TaskSlot()}
-        for i in range(no_of_slates):
-            state_representation["agent"][f"slot_{i+1}"] = AgentSlot(f"slot_{i+1}")
         
-        self.no_of_slates = no_of_slates
-        self.STATE_REPRESENTATION = state_representation # INITIALIZATION
+        self.TaskSlot = TaskSlot()
+        self.UserSlot = UserSlot()
+        self.AgentSlots = []
+        
+    """
+    Agent functions
+    """
+    def insert_agent_slot(self, name, slot_state, slot_value, slot_confidence):
+        self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
 
+    def remove_agent_slot(self, which_slot):
+        self.AgentSlots.pop(which_slot)
 
-    def get_slot_value(self, which_slot):
+    def print_agent_names(self):
+        names = []
+        for i in range(len(self.AgentSlots)):
+            names.append(self.AgentSlots[i].get_slot_name_slot())
+        return names
+
+    def get_slot_value(self, which_slot, index=0):
         """
         For getting value of a specific slot
 
@@ -22,9 +36,14 @@ class StateRepresentation:
         
         Returns: value of a specific slot
         """
-        slot_value = self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"].get_slot_value_confidence_slot()[0]["value"]
+        slot_value = self.AgentSlots[which_slot].get_slot_value_slot(index)
         return slot_value
     
+    def get_all_slot_values(self, which_slot):
+        slot_values = list()
+        for i in range(len(self.AgentSlots[which_slot].slot_value_confidence)):
+            slot_values.append(self.AgentSlots[which_slot].get_slot_value_slot(i))
+        return slot_values
 
     def get_all_slots_value(self): 
         """
@@ -33,8 +52,8 @@ class StateRepresentation:
         Returns: array of values for all slots ([ace, king,...]) for slot_1 and slot_2,...
         """
         slots_value = list()
-        for i in range(self.no_of_slates):
-            slots_value.append(self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_value_confidence_slot())
+        for i in range(len(self.AgentSlots)):
+            slots_value.append(self.AgentSlots[i].get_slot_value_confidence_slot())
         return slots_value
 
 
@@ -45,9 +64,9 @@ class StateRepresentation:
         Returns: array of arrays [[1, "ace"], [4, "two"],...] = [[which_slot_is_not_confirmed, slot_value],...] 
         """
         uncofirmed_slots = list()
-        for i in range(len(self.STATE_REPRESENTATION["agent"])):
-            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_state_slot() == "not_confirmed":
-                uncofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_value_confidence_slot()])
+        for i in range(len(self.AgentSlots)):
+            if self.AgentSlots[i].get_slot_state_slot() == "not_confirmed":
+                uncofirmed_slots.append([i+1, self.AgentSlots[i].get_slot_value_confidence_slot()])
         return uncofirmed_slots
 
     def get_all_confirmed_slots(self):
@@ -57,9 +76,9 @@ class StateRepresentation:
         Returns: array of arrays [[1, "ace"], [4, "two"],...] = [[which_slot_is_confirmed, slot_value],...] 
         """
         cofirmed_slots = list()
-        for i in range(len(self.STATE_REPRESENTATION["agent"])):
-            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_state_slot() == "confirmed":
-                cofirmed_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_value_cofidence_slot()])
+        for i in range(len(self.AgentSlots)):
+            if self.AgentSlots[i].get_slot_state_slot() == "confirmed":
+                cofirmed_slots.append([i+1, self.AgentSlots[i].get_slot_value_cofidence_slot()])
         return cofirmed_slots
 
     def get_all_inconsistent_slots(self):
@@ -68,9 +87,9 @@ class StateRepresentation:
         Returns: array of arrays [[1, ["ace",0.9]], [4, ["two",0.87]],...] = [[which_slot_is_inconsistent, [[slot_value_1, confidence_score_1], [slot_value_2, confidence_score_2]]],...] 
         """
         inconsistent_slots = list()
-        for i in range(len(self.STATE_REPRESENTATION["agent"])):
-            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_state_slot() == "inconsistent":
-                inconsistent_slots.append([i+1, self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_value_confidence_slot()])
+        for i in range(len(self.AgentSlots)):
+            if self.AgentSlots[i].get_slot_state_slot() == "inconsistent":
+                inconsistent_slots.append([i+1, self.AgentSlots[i].get_slot_value_confidence_slot()])
         return inconsistent_slots
 
 
@@ -81,8 +100,8 @@ class StateRepresentation:
         Returns: array of number of empty slots [1, 4, 7,...]
         """
         empty_slots = list()
-        for i in range(len(self.STATE_REPRESENTATION["agent"])):
-            if self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].get_slot_value_confidence_slot()["value"] is None:
+        for i in range(len(self.AgentSlots)):
+            if self.AgentSlots[i].get_slot_value_confidence_slot()["value"] is None:
                 empty_slots.append(i+1)
         return empty_slots
 
@@ -93,7 +112,7 @@ class StateRepresentation:
         Args: value to set, number of slot
         
         """
-        self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"].set_slot_value_confidence_slot(slot_value, slot_confidence)
+        self.AgentSlots[which_slot].set_slot_value_confidence_slot(slot_value, slot_confidence)
 
     def set_slot_not_cofirmed(self, which_slot):
         """
@@ -101,7 +120,7 @@ class StateRepresentation:
 
         Args: which slot to confirm
         """
-        self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"].set_slot_state_slot("not_confirmed")
+        self.AgentSlots[which_slot].set_slot_state_slot("not_confirmed")
 
     def set_slot_confirmed(self, which_slot):
         """
@@ -109,7 +128,7 @@ class StateRepresentation:
 
         Args: which slot to confirm
         """
-        self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"].set_slot_state_slot("confirmed")
+        self.AgentSlots[which_slot].set_slot_state_slot("confirmed")
 
     def set_slot_inconsistent(self, which_slot):
         """
@@ -117,19 +136,12 @@ class StateRepresentation:
 
         Args: which slot to inconsist
         """
-        self.STATE_REPRESENTATION["agent"][f"slot_{which_slot}"].set_slot_state_slot("inconsistent")
+        self.AgentSlots[which_slot].set_slot_state_slot("inconsistent")
     
-
-    def delete_state_representation(self):
-        """
-        Deletes the whole state representation - primarely for debugging purposes
-        """
-        self.STATE_REPRESENTATION["user"].set_user_state_slot(None)
-        self.STATE_REPRESENTATION["task"].set_task_state_slot(None)
-        for i in range(self.no_of_slates):
-            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].set_slot_value_confidence_slot(None, None)
-            self.STATE_REPRESENTATION["agent"][f"slot_{i+1}"].set_slot_state_slot(None)
-
+            
+    """
+    General functions
+    """
 
     def get_task_state(self):
         """
@@ -137,7 +149,7 @@ class StateRepresentation:
 
         Returns: (str) state of task
         """
-        task_state = self.STATE_REPRESENTATION["task"].get_task_state_slot()
+        task_state = self.TaskSlot.get_task_state_slot()
 
         return task_state
 
@@ -148,7 +160,7 @@ class StateRepresentation:
 
         Returns: (str) state of user
         """
-        user_state = self.STATE_REPRESENTATION["user"].get_user_state_slot()
+        user_state = self.UserSlot.get_user_state_slot()
         
         return user_state
 
@@ -159,7 +171,7 @@ class StateRepresentation:
 
         Args: the task state to be set
         """
-        self.STATE_REPRESENTATION["task"].set_task_state_slot(task_state)
+        self.TaskSlot.set_task_state_slot(task_state)
 
 
     def set_user_state(self, user_state):
@@ -168,7 +180,17 @@ class StateRepresentation:
 
         Args: the user state to be set
         """
-        self.STATE_REPRESENTATION["user"].set_user_state_slot(user_state)
+        self.UserSlot.set_user_state_slot(user_state)
+
+    
+    def delete_state_representation(self):
+        """
+        Deletes the whole state representation - primarely for debugging purposes
+        """
+        self.UserSlot.set_user_state_slot(None)
+        self.TaskSlot.set_task_state_slot(None)
+        self.AgentSlots = []
+            
 
 
 class TaskSlot:
@@ -192,10 +214,10 @@ class UserSlot:
         return self.user_state
 
 class AgentSlot:
-    def __init__(self, name):
+    def __init__(self, name, slot_state, slot_value, slot_confidence):
         self.name = name
-        self.slot_state = None
-        self.slot_value_confidence = []
+        self.slot_state = slot_state
+        self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]
 
     def set_slot_value_confidence_slot(self, slot_value, slot_confidence):
         if slot_value is None:
@@ -218,6 +240,9 @@ class AgentSlot:
     def get_slot_name_slot(self):
         return self.name
 
+    def get_slot_value_slot(self, index):
+        return self.slot_value_confidence[index]["value"]
+
     def get_slot_value_confidence_slot(self):
         return self.slot_value_confidence
 
@@ -228,17 +253,15 @@ class AgentSlot:
 
 if __name__ == "__main__":
 
-    skill_name = "poker_hands"
-    no_of_slates = 2 # 2 cards
-    STATE_REPRESENTATION = StateRepresentation(skill_name, no_of_slates)
-
-    STATE_REPRESENTATION.set_slot_value_confidence("test_2", 0.6, 1)
-    print(STATE_REPRESENTATION.get_slot_value(1))
-    print(STATE_REPRESENTATION.get_all_not_confirmed_slots())
-    STATE_REPRESENTATION.set_slot_value_confidence("test", 1, 1)
-    print(STATE_REPRESENTATION.get_all_inconsistent_slots())
-    print(STATE_REPRESENTATION.get_all_slots_value())
-    STATE_REPRESENTATION.delete_state_representation()
-    print(STATE_REPRESENTATION.get_all_slots_value())
+    STATE_REPRESENTATION = StateRepresentation()
 
 
+    STATE_REPRESENTATION.insert_agent_slot("kundibad", "not_confirmed", "test", 0.0)
+    #STATE_REPRESENTATION.insert_agent_slot("dement", "not_confirmed", "test_2", 0.9)
+    STATE_REPRESENTATION.set_slot_value_confidence("test_800", 0.1, 0)
+    #print(STATE_REPRESENTATION.get_all_inconsistent_slots())
+    print(STATE_REPRESENTATION.get_slot_value(0, 1))
+    print(STATE_REPRESENTATION.get_all_slot_values(0))
+    #AgentSlot = AgentSlot("prdel", "kunda", "test", 1.0)
+    #AgentSlot.set_slot_value_confidence_slot("nevim", 0.1)
+    #print(AgentSlot.get_slot_value_slot(1))
