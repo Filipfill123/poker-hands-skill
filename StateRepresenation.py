@@ -12,28 +12,63 @@ class StateRepresentation:
         self.TaskSlot = TaskSlot()
         self.UserSlot = UserSlot()
         self.AgentSlots = v()
-        self.Memory = list()
+        self.StateRepresentation = v(self.UserSlot, self.AgentSlots, self.TaskSlot) # not sure, if this is correct (maybe a basic list would do)
+        self.Memory = list() # can it be list or do we need v()?
         
+
+    def update_state_representation(self):
+        """
+        Updates StateRepresentation for Memory
+        """
+        self.StateRepresentation = v(self.UserSlot, self.AgentSlots, self.TaskSlot)
     """
     Agent functions
     """
-    def insert_agent_slot(self, name, slot_state, slot_value, slot_confidence):
-        self.Memory.append(self.AgentSlots)
-        self.AgentSlots = self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
+    def insert_agent_slot(self, name, slot_value, slot_confidence, slot_state="not_confirmed"):
+        """
+        Saves Memory of StateRepresentation and inserts a slot in Agent, then updates StateRepresentation
 
-    def replace_agent_slot(self, which_slot, name, slot_state, slot_value, slot_confidence):
-        self.Memory.append(self.AgentSlots)
+        Args: name of the slot, slot value, confidence score for the value, state of the slot is generally set as "not_confirmed"
+        """
+        self.Memory.append(self.StateRepresentation)
+        self.AgentSlots = self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
+        self.update_state_representation()
+
+    def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): # TODO
+        """
+        Saves Memory of StateRepresentation and replaces a desired slot with a different slot, then updates StateRepresentation
+
+        Args: idx of slot to replace, name of the new slot, value of the new slot, confidence score for the the value, state of the slot is generally set as "not_confirmed"
+        """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots = self.AgentSlots.set(which_slot)
+        self.update_state_representation()
 
     def remove_agent_slot(self, which_slot):
-        self.Memory.append(self.AgentSlots)
+        """
+        Saves Memory of StateRepresentation and removes a desired slot, then updates StateRepresentation
+
+        Args: idx of slot to remove
+        """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots = self.AgentSlots.delete(which_slot)
+        self.update_state_representation()
 
     def print_agent_names(self):
+        """
+        Primarely for debugging, prints names of all agent's slots
+        """
         names = []
         for i in range(len(self.AgentSlots)):
             names.append(self.AgentSlots[i].get_slot_name_slot())
         return names
+
+
+    def get_state_representation(self):
+        """
+        Returns whole StateRepresentation
+        """
+        return self.StateRepresentation
 
     def get_slot_value(self, which_slot, index=0):
         """
@@ -47,6 +82,11 @@ class StateRepresentation:
         return slot_value
     
     def get_all_slot_values(self, which_slot):
+        """
+        For getting all values of a single slot
+
+        Args: idx of slot
+        """
         slot_values = list()
         for i in range(len(self.AgentSlots[which_slot].slot_value_confidence)):
             slot_values.append(self.AgentSlots[which_slot].get_slot_value_slot(i))
@@ -108,7 +148,7 @@ class StateRepresentation:
         """
         empty_slots = list()
         for i in range(len(self.AgentSlots)):
-            if self.AgentSlots[i].get_slot_value_confidence_slot()["value"] is None:
+            if (self.AgentSlots[i].get_slot_state_slot() is None or self.AgentSlots[i].get_slot_state_slot() == "empty"):
                 empty_slots.append(i+1)
         return empty_slots
 
@@ -119,7 +159,9 @@ class StateRepresentation:
         Args: value to set, number of slot
         
         """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots[which_slot].set_slot_value_confidence_slot(slot_value, slot_confidence)
+        self.update_state_representation()
 
     def set_slot_not_cofirmed(self, which_slot):
         """
@@ -127,7 +169,9 @@ class StateRepresentation:
 
         Args: which slot to confirm
         """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots[which_slot].set_slot_state_slot("not_confirmed")
+        self.update_state_representation()
 
     def set_slot_confirmed(self, which_slot):
         """
@@ -135,7 +179,9 @@ class StateRepresentation:
 
         Args: which slot to confirm
         """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots[which_slot].set_slot_state_slot("confirmed")
+        self.update_state_representation()
 
     def set_slot_inconsistent(self, which_slot):
         """
@@ -143,7 +189,9 @@ class StateRepresentation:
 
         Args: which slot to inconsist
         """
+        self.Memory.append(self.StateRepresentation)
         self.AgentSlots[which_slot].set_slot_state_slot("inconsistent")
+        self.update_state_representation()
     
             
     """
@@ -201,59 +249,129 @@ class StateRepresentation:
 
 
 class TaskSlot:
+    """
+    Class for TaskSlot (similar to UserSlot class, different classes used for clarity)
+    """
     def __init__(self):
+        """
+        Initialization, TODO if task_state should be input
+        """
         self.task_state = None
 
     def set_task_state_slot(self, task_state):
+        """
+        For setting the task state
+
+        Args: task state (should be from a set of approved keywords)
+        """
         self.task_state = task_state
 
     def get_task_state_slot(self):
+        """
+        Returns task state
+        """
         return self.task_state
 
 class UserSlot:
+    """
+    Class for UserSlot (similar to TaskSlot class, different classes used for clarity)
+    """
     def __init__(self):
+        """
+        Initialization, TODO if user_state should be input
+        """
         self.user_state = None
     
     def set_user_state_slot(self, user_state):
+        """
+        For setting the user state
+
+        Args: user state (should be from a set of approved keywords)
+        """
         self.user_state = user_state
 
     def get_user_state_slot(self):
+        """
+        Returns user state
+        """
         return self.user_state
 
 class AgentSlot:
+    """
+    Class for AgentSlot
+    """
     def __init__(self, name, slot_state, slot_value, slot_confidence):
+        """
+        Initialization
+
+        Args: name of the slot, state of the slot, value for the slot, confidence score for the value
+        """
         self.name = name
         self.slot_state = slot_state
-        self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]
+        self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]  # slot value and confidence are linked and are in a list,
+                                                                                                   # so that we can have for than one pair of value and confidence
 
-    def set_slot_value_confidence_slot(self, slot_value, slot_confidence):
-        if slot_value is None:
-            pass
+
+    def set_slot_value_confidence_slot(self, slot_value, slot_confidence): # TODO better input of value-confidence_score when creating AgentSlot
+        """
+        Sets or inserts a new value-confidence_score pair in the slot. If it is the first pair to be set, state of the slot is "not_confirmed", else it is "inconsistent"
+
+        Args: slot value, confidence score for the value
+        """
+        if not self.get_slot_value_confidence_slot():
+            self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]
+            self.slot_state = "not_confirmed"
         else:
-            if not self.get_slot_value_confidence_slot():
-                self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]
-                self.slot_state = "not_confirmed"
-            else:
-                self.slot_value_confidence.append({"value": slot_value, "confidence_score": slot_confidence})
-                self.slot_value_confidence.sort(key=lambda x: x["confidence_score"], reverse=True)
-                self.slot_state = "inconsistent"
+            self.slot_value_confidence.append({"value": slot_value, "confidence_score": slot_confidence})
+            self.slot_value_confidence.sort(key=lambda x: x["confidence_score"], reverse=True)
+            self.slot_state = "inconsistent"
 
     def set_slot_state_slot(self, slot_state):
+        """
+        For setting a slot state
+
+        Args: slot state ("not_confirmed", "inconcistent", "confirmed", "empty"/None)
+        """
         self.slot_state = slot_state
 
     def get_all_slot_values(self):
+        """
+        Returns a dict() with slot_name, slot_value_confidence pair and slot_state
+        """
         return {"slot_name": self.name, "slot_value_confidence": self.slot_value_confidence, "slot_state": self.slot_state}
 
     def get_slot_name_slot(self):
+        """
+        Returns slot name
+        """
         return self.name
 
     def get_slot_value_slot(self, index):
+        """
+        Returns slot value
+
+        Args: idx of value-confidence pair of the slot
+        """
         return self.slot_value_confidence[index]["value"]
 
+    def get_slot_confidence_slot(self, index):
+        """
+        Returns confidence score for the value
+
+        Args: idx of value-confidence pair of the slot
+        """
+        return self.slot_value_confidence[index]["confidence_score"]
+
     def get_slot_value_confidence_slot(self):
+        """
+        Returns all value-confidence pairs of the slot
+        """
         return self.slot_value_confidence
 
     def get_slot_state_slot(self):
+        """
+        Returns a state of the slot
+        """
         return self.slot_state
 
             
@@ -263,18 +381,21 @@ if __name__ == "__main__":
     STATE_REPRESENTATION = StateRepresentation()
 
 
-    STATE_REPRESENTATION.insert_agent_slot("kundibad", "not_confirmed", "test", 0.0)
-    STATE_REPRESENTATION.insert_agent_slot("dement", "not_confirmed", "test_2", 0.9)
-    print(STATE_REPRESENTATION.AgentSlots)
-    print(STATE_REPRESENTATION.Memory)
-    STATE_REPRESENTATION.remove_agent_slot(0)
-    print(STATE_REPRESENTATION.AgentSlots)
-    print(STATE_REPRESENTATION.Memory)
+    STATE_REPRESENTATION.insert_agent_slot("slot_1", "test", 0.0)
+    STATE_REPRESENTATION.insert_agent_slot("slot_2", "test_2", 0.9)
+    print(STATE_REPRESENTATION.get_state_representation())
+    STATE_REPRESENTATION.insert_agent_slot("slot_3", "test_5", 0.4)
+    print(STATE_REPRESENTATION.get_state_representation())
+    # print(STATE_REPRESENTATION.AgentSlots)
+    # print(STATE_REPRESENTATION.Memory)
+    # STATE_REPRESENTATION.remove_agent_slot(0)
+    # print(STATE_REPRESENTATION.AgentSlots)
+    # print(STATE_REPRESENTATION.Memory)
     
     # seznam = list()
     # vector = v(1,2,3)
-    # v1 = vector.delete(0)
-    # print(v1)
-    # seznam.append(vector)
-    # seznam.append(v1)
-    # print(seznam)
+    # # v1 = vector.delete(0)
+    # print(vector)
+    # vector = v(0,0,0)
+    # print(vector)
+
