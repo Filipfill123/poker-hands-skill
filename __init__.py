@@ -7,9 +7,8 @@ import datetime
 
 class PokerHands(MycroftSkill):
     def __init__(self):
-        self.skill_name = "poker_hands"
-        self.no_of_slates = 2 # 2 cards
-        self.STATE_REPRESENTATION = StateRepresentation(self.skill_name, self.no_of_slates)
+        self.skill_name = type(self).__name__
+        self.STATE_REPRESENTATION = StateRepresentation(self.skill_name)
         # STATE_REPRESENTATION should be connection of user's intention + agent's state + task being "worked on"
         # states of task - ["in_progress" - in progress (the task is being worked on), "pair" - it's a pair, "no_pair" - it's not a pair]
         # states of slots - first value - card (if None, not understood or not answered yet), second value = [None - empty, "not_confirmed" - not confirmed, "confirmed" - confirmed, "inconsistent" - more than one value for slot]

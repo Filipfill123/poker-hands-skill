@@ -1,16 +1,15 @@
 from pyrsistent import v, pvector
 class StateRepresentation:
     
-    def __init__(self):
+    def __init__(self, user_state):
         """
         Initialization of STATE REPRESENTATION
         TaskSlot for task's state
         UserSlot for user's state
         AgentSlots for agent's slots
         """
-        
         self.TaskSlot = TaskSlot()
-        self.UserSlot = UserSlot()
+        self.UserSlot = UserSlot(user_state)
         self.AgentSlots = v()
         self.StateRepresentation = v(self.UserSlot, self.AgentSlots, self.TaskSlot) # not sure, if this is correct (maybe a basic list would do)
         self.Memory = list() # can it be list or do we need v()?
@@ -24,7 +23,7 @@ class StateRepresentation:
     """
     Agent functions
     """
-    def insert_agent_slot(self, name, slot_value, slot_confidence, slot_state="not_confirmed"):
+    def append_agent_slot(self, name, slot_value, slot_confidence, slot_state="not_confirmed"):
         """
         Saves Memory of StateRepresentation and inserts a slot in Agent, then updates StateRepresentation
 
@@ -34,14 +33,15 @@ class StateRepresentation:
         self.AgentSlots = self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
         self.update_state_representation()
 
-    def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): # TODO
+    def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): 
         """
         Saves Memory of StateRepresentation and replaces a desired slot with a different slot, then updates StateRepresentation
 
         Args: idx of slot to replace, name of the new slot, value of the new slot, confidence score for the the value, state of the slot is generally set as "not_confirmed"
         """
         self.Memory.append(self.StateRepresentation)
-        self.AgentSlots = self.AgentSlots.set(which_slot)
+        agent_slot = AgentSlot(name, slot_state, slot_value, slot_confidence)
+        self.AgentSlots = self.AgentSlots.set(which_slot, agent_slot)
         self.update_state_representation()
 
     def remove_agent_slot(self, which_slot):
@@ -276,11 +276,11 @@ class UserSlot:
     """
     Class for UserSlot (similar to TaskSlot class, different classes used for clarity)
     """
-    def __init__(self):
+    def __init__(self, user_state):
         """
         Initialization, TODO if user_state should be input
         """
-        self.user_state = None
+        self.user_state = user_state
     
     def set_user_state_slot(self, user_state):
         """
@@ -378,24 +378,21 @@ class AgentSlot:
 
 if __name__ == "__main__":
 
-    STATE_REPRESENTATION = StateRepresentation()
+    STATE_REPRESENTATION = StateRepresentation("test")
 
-
-    STATE_REPRESENTATION.insert_agent_slot("slot_1", "test", 0.0)
-    STATE_REPRESENTATION.insert_agent_slot("slot_2", "test_2", 0.9)
-    print(STATE_REPRESENTATION.get_state_representation())
-    STATE_REPRESENTATION.insert_agent_slot("slot_3", "test_5", 0.4)
-    print(STATE_REPRESENTATION.get_state_representation())
+    # STATE_REPRESENTATION.insert_agent_slot("slot_1", "test", 0.0)
+    # STATE_REPRESENTATION.insert_agent_slot("slot_2", "test_2", 0.9)
+    # print(STATE_REPRESENTATION.get_state_representation())
+    # STATE_REPRESENTATION.insert_agent_slot("slot_3", "test_5", 0.4)
+    # print(STATE_REPRESENTATION.get_state_representation())
     # print(STATE_REPRESENTATION.AgentSlots)
     # print(STATE_REPRESENTATION.Memory)
     # STATE_REPRESENTATION.remove_agent_slot(0)
     # print(STATE_REPRESENTATION.AgentSlots)
     # print(STATE_REPRESENTATION.Memory)
     
-    # seznam = list()
-    # vector = v(1,2,3)
-    # # v1 = vector.delete(0)
-    # print(vector)
-    # vector = v(0,0,0)
-    # print(vector)
+    vector = v(0,0)
+    # vector = vector.delete(0)
+    vector = vector.set(1, 1000)
+    print(vector)
 
