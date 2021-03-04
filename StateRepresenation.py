@@ -380,14 +380,5 @@ class AgentSlot:
 
 if __name__ == "__main__":
 
-    # STATE_REPRESENTATION = StateRepresentation("test")
-    # STATE_REPRESENTATION.update_agent_slot("first_card", "kunda", 1.0)
-    # STATE_REPRESENTATION.update_agent_slot("second_card", "ace", 1.0)
-    # print(STATE_REPRESENTATION.get_slot_value("first_card"))
-
-    mapa = m(first_card=AgentSlot("first_card", "not_confirmed", "ace", 0.99), second_card=AgentSlot("second_card", "not_confirmed", "ace", 0.99))
-    for key, value in mapa.iteritems():
-        print(key, value)
-    
-    mapa["first_card"].set_slot_value_confidence_slot("prdel", 0.1)
-    print(mapa["first_card"].get_slot_values_slot())
+    mapa = m()
+    print(len(mapa))

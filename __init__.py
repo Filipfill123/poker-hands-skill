@@ -9,6 +9,8 @@ class PokerHands(MycroftSkill):
     def __init__(self):
         self.skill_name = type(self).__name__
         self.STATE_REPRESENTATION = StateRepresentation(self.skill_name)
+        self.STATE_REPRESENTATION.update_agent_slot("first_card", None, None)
+        self.STATE_REPRESENTATION.update_agent_slot("second_card", None, None)
         # STATE_REPRESENTATION should be connection of user's intention + agent's state + task being "worked on"
         # states of task - ["in_progress" - in progress (the task is being worked on), "pair" - it's a pair, "no_pair" - it's not a pair]
         # states of slots - first value - card (if None, not understood or not answered yet), second value = [None - empty, "not_confirmed" - not confirmed, "confirmed" - confirmed, "inconsistent" - more than one value for slot]
@@ -149,7 +151,7 @@ class PokerHands(MycroftSkill):
     
     @intent_file_handler('kill.intent')
     def handle_kill(self, message):
-        if self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is None:
+        if (self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is None) or len(self.STATE_REPRESENTATION.AgentSlots == 0):
             result = f"Wait a second, your highness. I looked really hard but my state representation seems to be empty already. Please, don't kill me"
         elif self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is not None:
             result = f"The first card was empty, the second card was {self.STATE_REPRESENTATION.get_slot_value('second_card')}"
@@ -163,7 +165,7 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('show.intent')
     def handle_show(self, message):
-        if self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is None:
+        if (self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is None) or len(self.STATE_REPRESENTATION.AgentSlots == 0):
             result = f"The state representation is empty, my lord"
         elif self.STATE_REPRESENTATION.get_slot_value('first_card') is None and self.STATE_REPRESENTATION.get_slot_value('second_card') is not None:
             result = f"The first card is empty, the second card is {self.STATE_REPRESENTATION.get_slot_value('second_card')}"
