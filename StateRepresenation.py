@@ -1,4 +1,6 @@
 from pyrsistent import v, pvector
+from pyrsistent import m, pmap
+
 class StateRepresentation:
     
     def __init__(self, user_state):
@@ -10,7 +12,7 @@ class StateRepresentation:
         """
         self.TaskSlot = TaskSlot()
         self.UserSlot = UserSlot(user_state)
-        self.AgentSlots = v()
+        self.AgentSlots = m()
         self.StateRepresentation = v(self.UserSlot, self.AgentSlots, self.TaskSlot) # not sure, if this is correct (maybe a basic list would do)
         self.Memory = list() # can it be list or do we need v()?
         
@@ -23,26 +25,26 @@ class StateRepresentation:
     """
     Agent functions
     """
-    def append_agent_slot(self, name, slot_value, slot_confidence, slot_state="not_confirmed"):
+    def update_agent_slot(self, name, slot_value, slot_confidence, slot_state="not_confirmed"):
         """
         Saves Memory of StateRepresentation and inserts a slot in Agent, then updates StateRepresentation
 
         Args: name of the slot, slot value, confidence score for the value, state of the slot is generally set as "not_confirmed"
         """
         self.Memory.append(self.StateRepresentation)
-        self.AgentSlots = self.AgentSlots.append(AgentSlot(name, slot_state, slot_value, slot_confidence))
+        self.AgentSlots = self.AgentSlots.set(name, AgentSlot(name, slot_state, slot_value, slot_confidence))
         self.update_state_representation()
 
-    def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): 
-        """
-        Saves Memory of StateRepresentation and replaces a desired slot with a different slot, then updates StateRepresentation
+    # def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): 
+    #     """
+    #     Saves Memory of StateRepresentation and replaces a desired slot with a different slot, then updates StateRepresentation
 
-        Args: idx of slot to replace, name of the new slot, value of the new slot, confidence score for the the value, state of the slot is generally set as "not_confirmed"
-        """
-        self.Memory.append(self.StateRepresentation)
-        agent_slot = AgentSlot(name, slot_state, slot_value, slot_confidence)
-        self.AgentSlots = self.AgentSlots.set(which_slot, agent_slot)
-        self.update_state_representation()
+    #     Args: idx of slot to replace, name of the new slot, value of the new slot, confidence score for the the value, state of the slot is generally set as "not_confirmed"
+    #     """
+    #     self.Memory.append(self.StateRepresentation)
+    #     agent_slot = AgentSlot(name, slot_state, slot_value, slot_confidence)
+    #     self.AgentSlots = self.AgentSlots.set(which_slot, agent_slot)
+    #     self.update_state_representation()
 
     def remove_agent_slot(self, which_slot):
         """
@@ -51,7 +53,7 @@ class StateRepresentation:
         Args: idx of slot to remove
         """
         self.Memory.append(self.StateRepresentation)
-        self.AgentSlots = self.AgentSlots.delete(which_slot)
+        self.AgentSlots = self.AgentSlots.remove(which_slot)
         self.update_state_representation()
 
     def print_agent_names(self):
@@ -59,8 +61,8 @@ class StateRepresentation:
         Primarely for debugging, prints names of all agent's slots
         """
         names = []
-        for i in range(len(self.AgentSlots)):
-            names.append(self.AgentSlots[i].get_slot_name_slot())
+        for key, value in self.AgentSlots.iteritems():
+            names.append(key)
         return names
 
 
@@ -244,7 +246,7 @@ class StateRepresentation:
         """
         self.UserSlot.set_user_state_slot(None)
         self.TaskSlot.set_task_state_slot(None)
-        self.AgentSlots = v()
+        self.AgentSlots = m()
             
 
 
@@ -334,7 +336,7 @@ class AgentSlot:
         """
         self.slot_state = slot_state
 
-    def get_all_slot_values(self):
+    def get_all_slot_values_slot(self):
         """
         Returns a dict() with slot_name, slot_value_confidence pair and slot_state
         """
@@ -378,21 +380,14 @@ class AgentSlot:
 
 if __name__ == "__main__":
 
-    STATE_REPRESENTATION = StateRepresentation("test")
+    # STATE_REPRESENTATION = StateRepresentation("test")
+    # STATE_REPRESENTATION.update_agent_slot("first_card", "kunda", 1.0)
+    # STATE_REPRESENTATION.update_agent_slot("second_card", "ace", 1.0)
+    # print(STATE_REPRESENTATION.get_slot_value("first_card"))
 
-    # STATE_REPRESENTATION.insert_agent_slot("slot_1", "test", 0.0)
-    # STATE_REPRESENTATION.insert_agent_slot("slot_2", "test_2", 0.9)
-    # print(STATE_REPRESENTATION.get_state_representation())
-    # STATE_REPRESENTATION.insert_agent_slot("slot_3", "test_5", 0.4)
-    # print(STATE_REPRESENTATION.get_state_representation())
-    # print(STATE_REPRESENTATION.AgentSlots)
-    # print(STATE_REPRESENTATION.Memory)
-    # STATE_REPRESENTATION.remove_agent_slot(0)
-    # print(STATE_REPRESENTATION.AgentSlots)
-    # print(STATE_REPRESENTATION.Memory)
+    mapa = m(first_card=AgentSlot("first_card", "not_confirmed", "ace", 0.99), second_card=AgentSlot("second_card", "not_confirmed", "ace", 0.99))
+    for key, value in mapa.iteritems():
+        print(key, value)
     
-    vector = v(0,0)
-    # vector = vector.delete(0)
-    vector = vector.set(1, 1000)
-    print(vector)
-
+    mapa["first_card"].set_slot_value_confidence_slot("prdel", 0.1)
+    print(mapa["first_card"].get_slot_values_slot())
