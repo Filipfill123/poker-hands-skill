@@ -35,16 +35,6 @@ class StateRepresentation:
         self.AgentSlots = self.AgentSlots.set(name, AgentSlot(name, slot_state, slot_value, slot_confidence))
         self.update_state_representation()
 
-    # def replace_agent_slot(self, which_slot, name, slot_value, slot_confidence, slot_state="not_confirmed"): 
-    #     """
-    #     Saves Memory of StateRepresentation and replaces a desired slot with a different slot, then updates StateRepresentation
-
-    #     Args: idx of slot to replace, name of the new slot, value of the new slot, confidence score for the the value, state of the slot is generally set as "not_confirmed"
-    #     """
-    #     self.Memory.append(self.StateRepresentation)
-    #     agent_slot = AgentSlot(name, slot_state, slot_value, slot_confidence)
-    #     self.AgentSlots = self.AgentSlots.set(which_slot, agent_slot)
-    #     self.update_state_representation()
 
     def remove_agent_slot(self, which_slot):
         """
@@ -61,7 +51,7 @@ class StateRepresentation:
         Primarely for debugging, prints names of all agent's slots
         """
         names = []
-        for key, value in self.AgentSlots.iteritems():
+        for key in self.AgentSlots.iteritems():
             names.append(key)
         return names
 
@@ -311,10 +301,10 @@ class AgentSlot:
         self.name = name
         self.slot_state = slot_state
         self.slot_value_confidence = [{"value": slot_value, "confidence_score": slot_confidence}]  # slot value and confidence are linked and are in a list,
-                                                                                                   # so that we can have for than one pair of value and confidence
+                                                                                                   # so that we can have more than one pair of value and confidence
 
 
-    def set_slot_value_confidence_slot(self, slot_value, slot_confidence): # TODO better input of value-confidence_score when creating AgentSlot
+    def set_slot_value_confidence_slot(self, slot_value, slot_confidence):
         """
         Sets or inserts a new value-confidence_score pair in the slot. If it is the first pair to be set, state of the slot is "not_confirmed", else it is "inconsistent"
 
