@@ -29,7 +29,7 @@ class Slot():
 
     def __delattr__(self, name):
          del self.__dict__[name]
-         
+
     def is_valid(self, value):
         if value in self.cards:
             return True
@@ -65,11 +65,11 @@ class Value():
 
 class State():
 
-    # def __init__(self):
+    def __init__(self):
     #     self.Agent = Slot()
     #     self.User = Slot()
     #     self.Task = Slot()
-    #     self.History = History()
+        self.History = History()
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)
@@ -78,10 +78,15 @@ class State():
         return super().__setattr__(name, None)
         
     def __setattr__(self, name, value):
-        self.__dict__[name] = value
-
+        if name == 'History':
+            self.__dict__[name] = value
+        else:
+            self.History.history.append(self.__dict__[name])
+            self.__dict__[name] = value
+            
     def __delattr__(self, name):
-         del self.__dict__[name]
+        self.History.history.append(self.__dict__[name])
+        del self.__dict__[name]
 
 class History():
 
@@ -105,7 +110,8 @@ if __name__ == "__main__":
     #first_card.value = Value("king", confidence=0.9)
     #first_card.value = Value(confirmed=True)
     #second_card.value = Value("king", confidence=0.9)
-    test_state.first_card = first_card
+    del first_card.state
+    print(first_card.state)
     #test_state.second_card = second_card
     #print(test_state.first_card.value[0].value)
     
