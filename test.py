@@ -12,7 +12,7 @@ class Slot():
         return super().__setattr__(name, None)
 
     def __setattr__(self, name, value):
-        print(value)
+        #print(value)
         if name == 'value':
             if self.is_valid(value.value):
                 if self.value is None:
@@ -81,9 +81,13 @@ class State():
         if name == 'History':
             self.__dict__[name] = value
         else:
-            self.History.history.append(self.__dict__[name])
-            self.__dict__[name] = value
+            if (super().__getattribute__(name)) is None:
+                self.__dict__[name] = value
+            else:
+                self.History.history = self.__dict__[name]
+                self.__dict__[name] = value
             
+                
     def __delattr__(self, name):
         self.History.history.append(self.__dict__[name])
         del self.__dict__[name]
@@ -93,11 +97,28 @@ class History():
     def __init__(self):
         self.history = v()
 
+    def __getattribute__(self, name):
+        return super().__getattribute__(name)
+
+    def __getattr__(self, name):
+        return super().__setattr__(name, None)
+
+    def __setattr__(self, name, value):
+        #print(super().__getattribute__(name))
+        #if (super().__getattribute__(name)) is pvector([]):
+        self.__dict__[name] = value
+        #else:
+            #self.__dict__[name].append(value)
+            
+    def __delattr__(self, name):
+         del self.__dict__[name]
 
 if __name__ == "__main__":
 
     
     test_state = State()
+    History = History()
+    #print(History.history)
     #user = Slot()
     #task = Slot()
     first_card = Slot()
@@ -105,13 +126,15 @@ if __name__ == "__main__":
     first_card.value = Value("king", confidence=0.1)
     first_card.value = Value("ace", confidence=0.9)
     first_card.state = 'confirmed'
-    if first_card.state == 'confirmed':
-        print("testssss")
-    #first_card.value = Value("king", confidence=0.9)
-    #first_card.value = Value(confirmed=True)
-    #second_card.value = Value("king", confidence=0.9)
-    del first_card.state
-    print(first_card.state)
+    #print(test_state.History.history)
+    #print(test_state.prdel)
+    #print(test_state.prdel)
+    test_state.prdel = 'test'
+    print(test_state.prdel)
+    print(test_state.History.history)
+    test_state.prdel = "test_2"
+    print(test_state.History.history)
+    #print(test_state.prdel)
     #test_state.second_card = second_card
     #print(test_state.first_card.value[0].value)
     
