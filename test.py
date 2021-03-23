@@ -22,6 +22,7 @@ class Slot():
                     self.__dict__[name].append(value)
                     self.__dict__[name].sort(key=lambda x: x.confidence, reverse=True)
                     self.__dict__['state'] = 'inconsistent'
+                self.__dict__['first_value'] = self.__dict__[name][0].value
             else:
                 print("value not valid")
         else:
@@ -41,16 +42,12 @@ class Value():
     def __init__(self, *args, **kwargs):
         self.value = None
         self.confidence = 1.0
-        #self.confirmed = None
         if len(args) != 0:
             self.value = args[0]
         if len(kwargs) != 0:
             if 'confidence' in kwargs:
                 self.confidence = kwargs['confidence']
-            #if 'confirmed' in kwargs:
-                #self.state = kwargs['confirmed']
-        
-        
+
     def __getattribute__(self, name):
         return super().__getattribute__(name)
 
@@ -78,18 +75,14 @@ class State():
         return super().__setattr__(name, None)
         
     def __setattr__(self, name, value):
-        if name == 'History':
+        if (getattr(self, name, None)) is None:
             self.__dict__[name] = value
         else:
-            if (super().__getattribute__(name)) is None:
-                self.__dict__[name] = value
-            else:
-                self.History.history = self.__dict__[name]
-                self.__dict__[name] = value
-            
-                
+            self.History.history = self.History.history.append(self.__dict__[name])
+            self.__dict__[name] = value
+                 
     def __delattr__(self, name):
-        self.History.history.append(self.__dict__[name])
+        self.History.history = self.History.history.append(self.__dict__[name])
         del self.__dict__[name]
 
 class History():
@@ -104,11 +97,8 @@ class History():
         return super().__setattr__(name, None)
 
     def __setattr__(self, name, value):
-        #print(super().__getattribute__(name))
-        #if (super().__getattribute__(name)) is pvector([]):
         self.__dict__[name] = value
-        #else:
-            #self.__dict__[name].append(value)
+
             
     def __delattr__(self, name):
          del self.__dict__[name]
@@ -125,15 +115,27 @@ if __name__ == "__main__":
     #second_card = Slot()
     first_card.value = Value("king", confidence=0.1)
     first_card.value = Value("ace", confidence=0.9)
-    first_card.state = 'confirmed'
+    print(first_card.first_value)
     #print(test_state.History.history)
     #print(test_state.prdel)
     #print(test_state.prdel)
-    test_state.prdel = 'test'
-    print(test_state.prdel)
-    print(test_state.History.history)
-    test_state.prdel = "test_2"
-    print(test_state.History.history)
+    # print(test_state.prdel)
+    # test_state.prdel = "test_1"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_2"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_3"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_4"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_5"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_6"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_7"
+    # print(test_state.History.history)
+    # test_state.prdel = "test_8"
+    # print(test_state.History.history)    
     #print(test_state.prdel)
     #test_state.second_card = second_card
     #print(test_state.first_card.value[0].value)
