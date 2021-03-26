@@ -67,12 +67,12 @@ class Value:
 
 class State:
 
-    #def __init__(self):
+    def __init__(self):
     #     self.Agent = Slot()
     #     self.User = Slot()
     #     self.Task = Slot()
         # self.StateRepresentation = v()
-        #self.History = History()
+        self.History = History()
 
     def __getattribute__(self, name):
         #print(self.__dict__[name])
@@ -105,9 +105,9 @@ class State:
     def all_confirmed_slots(self):
         all_confirmed_slots = list()
         for attribute, value in self.__dict__.items():
-            print(attribute,'=', value)
-            if self.__dict__[attribute].state == 'unconfirmed' :
-                all_confirmed_slots.append(attribute)
+            if attribute != 'History':
+                if self.__dict__[attribute].state == 'unconfirmed' :
+                    all_confirmed_slots.append(attribute)
         return all_confirmed_slots
          
 class History:
@@ -130,7 +130,9 @@ if __name__ == "__main__":
     state.slot_2 = Slot()
     state.slot_1.value = Value('ace',0.9)
     state.slot_2.value = Value('king')
-    print(state.all_confirmed_slots)
+    blabla = state.all_confirmed_slots
+    for i in range(len(blabla)):
+        print(state.__dict__[blabla[i]].value)
     # slot.value = Value('king', 0.07)
     # slot.value = Value('queen', 0.05)
     # slot.value = Value('jack', 0.01)
