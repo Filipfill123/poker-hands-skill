@@ -14,7 +14,6 @@ class Slot():
     def __setattr__(self, name, value):
         
         if name == 'value':
-            print(value.value_confidence)
             if self.is_valid(value.value_confidence['value']):
                 if self.value is None:
                     self.__dict__[name] = [value]
@@ -43,8 +42,11 @@ class Value():
     def __init__(self, **kwargs):
         if 'value' in kwargs and 'confidence' in kwargs:
             self.value_confidence = m(value=kwargs['value'], confidence=kwargs['confidence'])
+        elif 'value' in kwargs:
+            self.value_confidence = m(value=kwargs['value'], confidence=1.0)
         else:
-            self.state = m(value=kwargs['state'])
+            #self.state = m(value=kwargs['state'])
+            self.state = kwargs['state']
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)
@@ -86,6 +88,13 @@ class State():
         self.History.history = self.History.history.append(self.__dict__[name])
         del self.__dict__[name]
 
+    def delete_state_representation(self):
+        for attribute, value in self.__dict__.items():
+            
+            self.__dict__[attribute] = None
+            
+        #self.History.history = self.History.history.append(self.__dict__[name])
+         
 class History():
 
     def __init__(self):
@@ -105,13 +114,17 @@ if __name__ == "__main__":
     test_state = State()
     #user = Slot()
     #task = Slot()
-    first_card = Slot()
+    test_state.first_card = Slot()
+    test_state.task_state = Slot()
+    test_state.task_state.state = Value(state='pair')
+    test_state.first_card.value = Value(value="ace")
+    print(test_state.first_card.state)
+    test_state.first_card.state = 'confirmed'
+
+    print(test_state.delete_state_representation())
     #second_card = Slot()
-    print(first_card.state)
-    first_card.value = Value(value="king", confidence=0.1)
-    first_card.value = Value(value="ace", confidence=0.9)
-    test_state.first_card = first_card
-    print(test_state.first_card)
+    #
+    #print(test_state.first_card.value[0].value_confidence['value'])
     #print(test_state.History.history)
     #print(test_state.prdel)
     #print(test_state.prdel)

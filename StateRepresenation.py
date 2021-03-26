@@ -1,6 +1,7 @@
 from pyrsistent import v, pvector
 from pyrsistent import m, pmap
 
+
 class StateRepresentation:
     
     def __init__(self, user_state):
