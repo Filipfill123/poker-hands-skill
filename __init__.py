@@ -86,7 +86,7 @@ class PokerHands(MycroftSkill):
         time = datetime.datetime.now()
 
         if  self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value'] ==  self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']:
-            result = f"it is a pair of { self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']}s"
+            result = f"it is a pair of {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']}s"
             self.STATE_REPRESENTATION.task_state.state = Value(state='pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state} \n")

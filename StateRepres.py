@@ -39,14 +39,9 @@ class Slot:
 
 class Value:
 
-    def __init__(self, **kwargs):
-        if 'value' in kwargs and 'confidence' in kwargs:
-            self.value_confidence = m(value=kwargs['value'], confidence=kwargs['confidence'])
-        elif 'value' in kwargs:
-            self.value_confidence = m(value=kwargs['value'], confidence=1.0)
-        else:
-            #self.state = m(value=kwargs['state'])
-            self.state = kwargs['state']
+    def __init__(self, value='placeholder_value', confidence=1.0, state='placeholder_state'):
+        self.value_confidence = m(value=value, confidence=confidence)
+        self.state = state
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)
