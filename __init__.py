@@ -1,8 +1,8 @@
 from mycroft import MycroftSkill, intent_file_handler
 import sys
 sys.path.append('/opt/mycroft/skills/poker-hands-skill')
-from StateRepresenation import StateRepresentation
-from test import Value, Slot, State, History
+#from StateRepresenation import StateRepresentation
+from StateRepres import Slot, Value, State
 import datetime
 
 
@@ -46,7 +46,7 @@ class PokerHands(MycroftSkill):
     @intent_file_handler('first.card.hands.poker.intent')
     def handle_first_card_hands_poker(self, message):
         first_card = message.data.get('first_card')
-        if self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value'] is not None:
+        if self.STATE_REPRESENTATION.first_card.first_value is not None:
             result = f"I already know the first card. It is {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']}. Please, what is the second card?"
             self.speak_dialog('hands.poker', data={"result": result})
         elif self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value'] is None and self.STATE_REPRESENTATION.first_card.is_valid(first_card):    
@@ -63,7 +63,7 @@ class PokerHands(MycroftSkill):
     @intent_file_handler('second.card.hands.poker.intent')
     def handle_second_card_hands_poker(self, message):
         second_card = message.data.get('second_card')
-        if self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value'] is not None:
+        if self.STATE_REPRESENTATION.second_card.first_value is not None:
             result = f"I already know the second card. It is {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']}. Please, what is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
         elif self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value'] is None and self.STATE_REPRESENTATION.second_card.is_valid(second_card):
@@ -96,7 +96,7 @@ class PokerHands(MycroftSkill):
             result = f"{self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} and {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} is not a pair"
             self.STATE_REPRESENTATION.task_state.state = Value(state='no_pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
-                logging.write(f"{time}: {sself.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state} \n")
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state} \n")
             self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
     
@@ -116,7 +116,7 @@ class PokerHands(MycroftSkill):
             self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
-            result = f"{self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} and {sself.STATE_REPRESENTATION.second_card.value[0].value_confidence['value'} is not a pair"
+            result = f"{self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} and {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} is not a pair"
             self.STATE_REPRESENTATION.task_state.state = Value(state='no_pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state} \n")
@@ -135,7 +135,7 @@ class PokerHands(MycroftSkill):
             result = f"it is a pair of {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']}s"
             self.STATE_REPRESENTATION.task_state.state = Value(state='pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
-                logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state)} \n")
+                logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.value[0].value_confidence['value']} + {self.STATE_REPRESENTATION.second_card.value[0].value_confidence['value']} = {self.STATE_REPRESENTATION.task_state.state.state} \n")
             self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
