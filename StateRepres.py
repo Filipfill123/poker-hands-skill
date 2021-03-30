@@ -83,9 +83,11 @@ class State:
     def __init__(self):
         self.__user = None
         self.__task = None
-        self.__agent = v()
+        # self.__agent = v()
+        self.__agent = list()
         self.__History = History()
-        self.__StateRepresentation = m(user=self.__user, agent=self.__agent, task=self.__task, history=self.__History)
+        # self.__StateRepresentation = m(user=self.__user, agent=self.__agent, task=self.__task, history=self.__History)
+        self.__StateRepresentation = {"user":self.__user, "agent":self.__agent, "task":self.__task, "history": self.__History}
         
 
     def __getattribute__(self, name):
@@ -95,7 +97,8 @@ class State:
         return super().__setattr__(name, None)
         
     def __setattr__(self, name, value_in):
-        self.__History = self.__History.history.append(self.__StateRepresentation)
+        if self.__History is not None:
+            self.__History.history = self.__History.history.append(self.__StateRepresentation)
         if name.startswith('_State'):
             self.__dict__[name] = value_in
         else:
@@ -103,17 +106,18 @@ class State:
             slot.value = value_in
             self.__dict__[name] = slot
             self.__agent = self.__agent.append(slot)
-
-        self.__StateRepresentation = self.__StateRepresentation.set(name, value_in)  
+        
+        #if self.__StateRepresentation is not None:
+            #self.__StateRepresentation = self.__StateRepresentation.append(name)  
        
     def __delattr__(self, name):
-        self.__History = self.__History.history.append(self.__StateRepresentation)
+        self.__History.history = self.__History.history.append(self.__StateRepresentation)
         del self.__dict__[name]
         for slot in self.__agent:
             if slot.name == name:
                 self.__agent = self.__agent.delete(self.__agent.index(slot))
 
-        self.__StateRepresentation = self.__StateRepresentation.set('agent', self.__agent)
+        self.__StateRepresentation['agent'] = self.__agent
 
 
     @property
@@ -122,7 +126,7 @@ class State:
 
     @user.setter
     def user(self, value):
-        self.__History = self.__History.history.append(self.__StateRepresentation)
+        self.__History.history = self.__History.history.append(self.__StateRepresentation)
         self.__user = Slot('user')
         self.__user.value = Value(state=value)
         self.__StateRepresentation = self.__StateRepresentation.set('user', self.__user)
@@ -133,7 +137,7 @@ class State:
 
     @task.setter
     def task(self, value):
-        self.__History = self.__History.history.append(self.__StateRepresentation)
+        self.__History.history = self.__History.history.append(self.__StateRepresentation)
         self.__task = Slot('task')
         self.__task.value = Value(state=value)
         self.__StateRepresentation = self.__StateRepresentation.set('task', self.__task)
@@ -145,6 +149,10 @@ class State:
     @property
     def agent(self):
         return self.__agent
+
+    @property
+    def history(self):
+        return self.__History.history
 
     
     @property
@@ -198,17 +206,10 @@ class ValueTest:
 
 if __name__ == "__main__":
     
-
-    # test_state = State()
-    # first_card = Slot('first_card')
-    # second_card = Slot('second_card')
-    # test_state.first_card = Value(value='ace',confidence=0.9)
-    # test_state.second_card = Value(value='ace',confidence=0.9)
-    # print(test_state.all_unconfirmed_slots)
-    vector = m(a=Slot('test'),b=Slot("nevim"),c=Slot('test_2'))
-    print(vector)
-    vector = m(a=1,b=2,c=3)
-    print(vector)
-
+    test_state = State()
+    test_state.first_card = Value('ace')
+    print(test_state.history[1]['agent'][0].first_value)
+    
+    
 
     
