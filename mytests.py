@@ -72,40 +72,50 @@ class Value:
 class State:
 
     def __init__(self):
-    #     self.Agent = Slot()
-    #     self.User = Slot()
-    #     self.Task = Slot()
-        # self.StateRepresentation = v()
+        self.__user = None
+        self.__task = None
+        self.__agent = v()
+        self.StateRepresentation = v()
         self.History = History()
 
 
     def __getattribute__(self, name):
-        #print(self.__dict__[name])
         return super().__getattribute__(name)
-        
-        #return self.__dict__[name].first_value
 
     def __getattr__(self, name):
         return super().__setattr__(name, None)
         
     def __setattr__(self, name, value):
-        if (getattr(self, name, None)) is None:
-            self.__dict__[name] = value
-        else:
-            #self.History.history = self.History.history.append(self.__dict__[name])
-            self.__dict__[name] = value
+        print(name)
+        self.__dict__[name] = value
                  
     def __delattr__(self, name):
-       # self.History.history = self.History.history.append(self.__dict__[name])
         del self.__dict__[name]
 
-    def delete_state_representation(self):
-        for attribute in self.__dict__.items():
-            
-            self.__dict__[attribute] = None
-    
-        #self.History.history = self.History.history.append(self.__dict__[name])
 
+    @property
+    def user(self):
+        return self.User
+
+    @user.setter
+    def user(self, value):
+        self.__user = Slot()
+        self.__user.value = Value(state=value)
+
+    @property
+    def task(self):
+        return self.Task
+
+    @task.setter
+    def task(self, value):
+        self.__task = Slot()
+        self.__task.value = Value(state=value)
+
+    @property
+    def state_representation(self):
+        return self.StateRepresentation
+
+    
     @property
     def all_unconfirmed_slots(self):
         all_unconfirmed_slots = list()
@@ -132,6 +142,12 @@ class State:
                 if self.__dict__[attribute].state == 'inconsistent' :
                     all_inconsistent_slots.append(attribute)
         return all_inconsistent_slots
+
+    
+    def delete_state_representation(self):
+        for attribute in self.__dict__.items():
+            
+            self.__dict__[attribute] = None
          
 class History:
 
@@ -145,8 +161,6 @@ class ValueTest:
     value_confidence: float = field(init=False)
 
     def __post_init__(self):
-        if self.confidence < 0.0 or self.confidence > 1.0:
-            self.confidence = 1.0
         self.value_confidence = m(value=self.value, confidence=self.confidence)
         
 
@@ -156,18 +170,29 @@ class Tests():
     def first_value(self):
         state = State()
         state.slot = Slot()
-        state.slot.value = Value(value="king",confidence=0.05)
-        state.slot.value = Value(value="ace",confidence=0.9)
+        state.slot.value = ValueTest(value="king",confidence=0.05)
+        state.slot.value = ValueTest(value="ace",confidence=0.9)
         return state.slot.first_value
+
+    def all_values(self):
+        state = State()
+        state.slot = Slot()
+        state.slot.value = ValueTest(value="king",confidence=0.05)
+        state.slot.value = ValueTest(value="ace",confidence=0.7)
+        state.slot.value = ValueTest(value="two",confidence=0.02)
+        state.slot.value = ValueTest(value="three",confidence=0.002)
+        state.slot.value = ValueTest(value="seven")
+        state.slot.value = ValueTest(value="chyba")
+        return state.slot.all_values
 
     def all_unconfirmed_slots(self):
         state = State()
         state.slot_1 = Slot()
         state.slot_2 = Slot()
         state.slot_3 = Slot()
-        state.slot_1.value = Value('ace',0.9)
-        state.slot_2.value = Value('king')
-        state.slot_3.value = Value("two")
+        state.slot_1.value = ValueTest('ace',0.9)
+        state.slot_2.value = ValueTest('king')
+        state.slot_3.value = ValueTest("two")
         state.slot_3.state = 'confirmed'
         return state.all_unconfirmed_slots
 
@@ -177,11 +202,11 @@ class Tests():
         state.slot_2 = Slot()
         state.slot_3 = Slot()
 
-        state.slot_1.value = Value('ace',0.9)
+        state.slot_1.value = ValueTest('ace',0.9)
 
-        state.slot_2.value = Value('king')
+        state.slot_2.value = ValueTest('king')
 
-        state.slot_3.value = Value("two")
+        state.slot_3.value = ValueTest("two")
 
         state.slot_1.state = 'confirmed'
         state.slot_3.state = 'confirmed'
@@ -194,13 +219,13 @@ class Tests():
         state.slot_2 = Slot()
         state.slot_3 = Slot()
 
-        state.slot_1.value = Value('ace',0.9)
+        state.slot_1.value = ValueTest('ace',0.9)
 
-        state.slot_2.value = Value('king',0.9)
-        state.slot_2.value = Value('three',0.02)
+        state.slot_2.value = ValueTest('king',0.9)
+        state.slot_2.value = ValueTest('three',0.02)
 
-        state.slot_3.value = Value("two", 0.8)
-        state.slot_3.value = Value("seven", 0.1)
+        state.slot_3.value = ValueTest("two", 0.8)
+        state.slot_3.value = ValueTest("seven", 0.1)
 
         return state.all_inconsistent_slots
 
@@ -209,10 +234,14 @@ class MyFirstTests(unittest.TestCase):
     Tests
     """
         
-    
+    def test_all_values(self):
+        tests = Tests()
+        self.assertEqual(tests.all_values(), ['seven', 'ace','king' ,'two', 'three'])
+
+
     def test_first_value(self):
         tests = Tests()
-        self.assertEqual(tests.first_value(), "ace", "Should be ace")
+        self.assertEqual(tests.first_value(), "ace")
 
     def test_unconfirmed(self):
         tests = Tests()
@@ -225,7 +254,6 @@ class MyFirstTests(unittest.TestCase):
     def test_inconsistent(self):
         tests = Tests()
         self.assertEqual(tests.all_inconsistent_slots(), ['slot_2', 'slot_3'])
-
 
 if __name__ == '__main__':
     unittest.main()
