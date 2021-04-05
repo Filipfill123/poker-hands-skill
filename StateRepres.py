@@ -180,7 +180,14 @@ class State:
     def push(self, **kwargs):
         for key, value_in in kwargs.items():
             slot = Slot()
-            slot.value = value_in
+            try:
+                if len(value_in) > 1:
+                    for value_in_in in value_in:
+                        slot.value = value_in_in
+                else:
+                    slot.value = value_in[0]
+            except TypeError:
+                slot.value = value_in
             self.__dict__[key] = slot
 
 class History:
@@ -200,14 +207,16 @@ class Value:
 if __name__ == "__main__":
     
     test_state = State()
+    #first_card = Slot()
     test_state.first_card = Value('ace')
     #print(test_state.first_card.value)
-    
-    test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
-    test_state.first_card = Value('two', 0.05)
-    test_state.first_card.solve_inconsistency('ace')
-    print(test_state.slot_1.all_values)
-
+    value = Value('ace')
+    print(isinstance(value, Value))
+    # test_state.push(slot_1=Value("ace", confidence=0.8))
+    # print(test_state.slot_1.all_values)
+    # test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
+    # state.push(slot="king", confidence=0.05)
+    # state.push(slot_1="ace", slot_2="king", confidence=0.05)
     # state.push(slot_1=["ace", "king"])
     
 
