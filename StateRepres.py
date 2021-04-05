@@ -179,15 +179,27 @@ class State:
 
     def push(self, **kwargs):
         for key, value_in in kwargs.items():
+
             slot = Slot()
-            try:
+
+            if isinstance(value_in, list):
                 if len(value_in) > 1:
                     for value_in_in in value_in:
-                        slot.value = value_in_in
+                        if isinstance(value_in_in, Value):
+                            slot.value = value_in_in
+                        else:
+                            slot.value = Value(value_in_in)
                 else:
-                    slot.value = value_in[0]
-            except TypeError:
-                slot.value = value_in
+                    if isinstance(value_in[0], Value):
+                        slot.value = value_in[0]
+                    else:
+                        slot.value = Value(value_in[0])
+            else:
+                if isinstance(value_in, Value):
+                    slot.value = value_in
+                else:
+                    slot.value = Value(value_in)
+
             self.__dict__[key] = slot
 
 class History:
@@ -208,12 +220,10 @@ if __name__ == "__main__":
     
     test_state = State()
     #first_card = Slot()
-    test_state.first_card = Value('ace')
     #print(test_state.first_card.value)
-    value = Value('ace')
-    print(isinstance(value, Value))
-    # test_state.push(slot_1=Value("ace", confidence=0.8))
-    # print(test_state.slot_1.all_values)
+    
+    test_state.push(slot_1=["ace"])
+    print(test_state.slot_1.all_values)
     # test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
     # state.push(slot="king", confidence=0.05)
     # state.push(slot_1="ace", slot_2="king", confidence=0.05)
