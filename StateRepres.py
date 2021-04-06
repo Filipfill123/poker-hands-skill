@@ -182,7 +182,7 @@ class State:
 
             slot = Slot()
 
-            if isinstance(value_in, list):
+            if isinstance(value_in, (list, tuple)):
                 if len(value_in) > 1:
                     for value_in_in in value_in:
                         if isinstance(value_in_in, Value):
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     #first_card = Slot()
     #print(test_state.first_card.value)
     
-    test_state.push(slot_1=["ace"])
+    test_state.push(slot_1=("ace", "king", ""))
     print(test_state.slot_1.all_values)
     # test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
     # state.push(slot="king", confidence=0.05)
