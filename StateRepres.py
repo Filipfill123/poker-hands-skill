@@ -202,6 +202,23 @@ class State:
 
             self.__dict__[key] = slot
 
+    def act(self, idx, **kwargs):
+        if idx == "DISAMBIG":
+            self.disambig(kwargs)
+        elif idx == "PRESENT":
+            self.present(kwargs)
+
+    def disambig(self, slots):
+        for key, value in slots.items():
+            print(value, '=>', key)
+
+    def present(self, slots):
+        for key, value in slots.items():
+            print(key, '=>', value)
+
+
+
+
 class History:
 
     def __init__(self):
@@ -209,7 +226,7 @@ class History:
 
 @dataclass
 class Value:
-    value: str
+    value: str = None
     confidence: float = 1.0
     value_confidence: float = field(init=False)
 
@@ -218,16 +235,13 @@ class Value:
 
 if __name__ == "__main__":
     
-    test_state = State()
     #first_card = Slot()
     #print(test_state.first_card.value)
     
-    test_state.push(slot_1=("ace", "king", ""))
-    print(test_state.slot_1.all_values)
+    state = State()
+    state.push(slot_1=('ace','king'))
+    state.act("DISAMBIG", slot_1=('ace','king'), slot_2=Value('two'))
     # test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
     # state.push(slot="king", confidence=0.05)
     # state.push(slot_1="ace", slot_2="king", confidence=0.05)
     # state.push(slot_1=["ace", "king"])
-    
-
-    
