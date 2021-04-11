@@ -285,8 +285,8 @@ if __name__ == "__main__":
     state = State()
 
     state.new_slots(to_station=Station, from_station=Station, time=TimeValue, train_type=TraintypeEnum)
-    state.push(to_station=('prdelakov'))
-    print(state.to_station.value)
+    state.push(to_station=('praha_hlavni_nadrazi'))
+    print(state.to_station.valid)
     # state.act("DISAMBIG", slot_1=('ace','king'), slot_2=Value('two'))
     # test_state.push(slot_1=Value("ace", confidence=0.9), slot_2=Value("king", confidence=0.05))
     # state.push(slot="king", confidence=0.05)
