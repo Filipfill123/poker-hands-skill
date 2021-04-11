@@ -22,15 +22,16 @@ class PokerHands(MycroftSkill):
         first_card = message.data.get('first_card')
         second_card = message.data.get('second_card')
         self.STATE_REPRESENTATION.push(first_card=first_card, second_card=second_card)
-        if (self.STATE_REPRESENTATION.first_card.first_value is None) and (self.STATE_REPRESENTATION.second_card.first_value is None): # both card were misunderstood
+
+        if (not self.STATE_REPRESENTATION.first_card.first_value) and (not self.STATE_REPRESENTATION.second_card.first_value): # both card were misunderstood
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
             self.speak_dialog('hands.poker.all.wrong')
         
-        elif (self.STATE_REPRESENTATION.first_card.first_value is None) and (self.STATE_REPRESENTATION.second_card.first_value is not None): # first card was misunderstood
+        elif (not self.STATE_REPRESENTATION.first_card.first_value) and (self.STATE_REPRESENTATION.second_card.first_value): # first card was misunderstood
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.first_card)
             self.speak_dialog('hands.poker.first.wrong', data={"second_card": second_card})
         
-        elif (self.STATE_REPRESENTATION.first_card.first_value is not None) and (self.STATE_REPRESENTATION.second_card.first_value is not None): # second card was misunderstood
+        elif (self.STATE_REPRESENTATION.first_card.first_value) and (not self.STATE_REPRESENTATION.second_card.first_value): # second card was misunderstood
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.second_card)
             self.speak_dialog('hands.poker.second.wrong', data={"first_card": first_card})
         
@@ -42,11 +43,11 @@ class PokerHands(MycroftSkill):
     def handle_first_card_hands_poker(self, message):
         first_card = message.data.get('first_card')
         self.STATE_REPRESENTATION.push(first_card=first_card)
-        if len(self.STATE_REPRESENTATION.first_card.all_values) != 0:
+        if len(self.STATE_REPRESENTATION.first_card.all_values) > 1:
             result = f"I already know the first card. It is {self.STATE_REPRESENTATION.first_card.first_value}. Please, what is the second card?"
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.second_card)
             self.speak_dialog('hands.poker', data={"result": result})
-        elif self.STATE_REPRESENTATION.second_card.first_value is None and self.STATE_REPRESENTATION.first_card.first_value:    
+        elif (not self.STATE_REPRESENTATION.second_card.first_value) and (self.STATE_REPRESENTATION.first_card.first_value): 
             result = f"The first card is {first_card}. What is the second card?"
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.second_card)
             self.speak_dialog('hands.poker', data={"result": result})   
@@ -62,11 +63,11 @@ class PokerHands(MycroftSkill):
     def handle_second_card_hands_poker(self, message):
         second_card = message.data.get('second_card')
         self.STATE_REPRESENTATION.push(second_card=second_card)
-        if len(self.STATE_REPRESENTATION.second_card.all_values) != 0:
+        if len(self.STATE_REPRESENTATION.second_card.all_values) > 1:
             result = f"I already know the second card. It is {self.STATE_REPRESENTATION.second_card.first_value}. Please, what is the first card?"
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.first_card)
             self.speak_dialog('hands.poker', data={"result": result})
-        elif self.STATE_REPRESENTATION.first_card.first_value is None and self.STATE_REPRESENTATION.second_card.first_value:
+        elif (not self.STATE_REPRESENTATION.first_card.first_value) and (self.STATE_REPRESENTATION.second_card.first_value):
             self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.first_card)
             result = f"The second card is {second_card}. What is the first card?"
             self.speak_dialog('hands.poker', data={"result": result})
@@ -148,13 +149,13 @@ class PokerHands(MycroftSkill):
     
     @intent_file_handler('kill.intent')
     def handle_kill(self, message):
-        if (self.STATE_REPRESENTATION.first_card.first_value is None and self.STATE_REPRESENTATION.second_card.first_value is None):
+        if (not self.STATE_REPRESENTATION.first_card.first_value) and (not self.STATE_REPRESENTATION.second_card.first_value):
             result = f"Wait a second, your highness. I looked really hard but my state representation seems to be empty already. Please, don't kill me"
-        elif self.STATE_REPRESENTATION.first_card.first_value is None and self.STATE_REPRESENTATION.second_card.first_value is not None:
+        elif not self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:
             result = f"The first card was empty, the second card was {self.STATE_REPRESENTATION.second_card.first_value}"
-        elif self.STATE_REPRESENTATION.first_card.first_value is not None and self.STATE_REPRESENTATION.second_card.first_value is None:    
+        elif self.STATE_REPRESENTATION.first_card.first_value and not self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card was {self.STATE_REPRESENTATION.first_card.first_value}, the second card was empty"
-        elif self.STATE_REPRESENTATION.first_card.first_value is not None and self.STATE_REPRESENTATION.second_card.first_value is not None:    
+        elif self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card was {self.STATE_REPRESENTATION.first_card.first_value}, the second card was {self.STATE_REPRESENTATION.second_card.first_value}"
         self.STATE_REPRESENTATION.delete_state_representation()
 
@@ -162,13 +163,13 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('show.intent')
     def handle_show(self, message):
-        if (self.self.STATE_REPRESENTATION.first_card.first_value is None and self.STATE_REPRESENTATION.second_card.first_value is None):
+        if (not self.STATE_REPRESENTATION.first_card.first_value) and (not self.STATE_REPRESENTATION.second_card.first_value):
             result = f"The state representation is empty, my lord"
-        elif self.STATE_REPRESENTATION.first_card.first_value is None and self.STATE_REPRESENTATION.second_card.first_value is not None:
+        elif not self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:
             result = f"The first card is empty, the second card is {self.STATE_REPRESENTATION.second_card.first_value}"
-        elif self.STATE_REPRESENTATION.first_card.first_value is not None and self.STATE_REPRESENTATION.second_card.first_value is None:    
+        elif self.STATE_REPRESENTATION.first_card.first_value and not self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card is {self.STATE_REPRESENTATION.first_card.first_value}, the second card is empty"
-        elif self.STATE_REPRESENTATION.first_card.first_value is not None and self.STATE_REPRESENTATION.second_card.first_value is not None:    
+        elif self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card is {self.STATE_REPRESENTATION.first_card.first_value}, the second card is {self.STATE_REPRESENTATION.second_card.first_value}"
 
         self.speak_dialog('show', data={"result": result})

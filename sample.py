@@ -238,6 +238,7 @@ class State:
             self.__dict__[slot_name + '_value_class'] = value_class
             self.__dict__[slot_name] = Slot()
             self.slot_names = self.slot_names.append(slot_name)
+            print("new slot added: ", slot_name)
         self.History = self.History.append(self.slot_names)
 
     def delete_state_representation(self):
