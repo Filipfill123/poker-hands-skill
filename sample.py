@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-import unittest
-import datetime
 from pyrsistent import pvector, v, pmap, m
 
 
@@ -247,35 +245,35 @@ class State:
             self.__dict__[slot_name] = Slot()
 
 
-print("""
+# print("""
 
-Example 1
+# Example 1
 
-""")
+# """)
 
-s = State()
-s.new_slots(slot_1=Cards, slot_2=Cards, slot_3=Cards)
+# s = State()
+# s.new_slots(slot_1=Cards, slot_2=Cards, slot_3=Cards)
 
-# Turn 1
-#s.expect(s.complete_empty, s.slot_1, s.slot_2, s.slot_3)
-s.push(slot_1=["king", "ace"], slot_2=["two"])
-s.expect(s.complete_empty, s.slot_3)
+# # Turn 1
+# #s.expect(s.complete_empty, s.slot_1, s.slot_2, s.slot_3)
+# s.push(slot_1=["king", "ace"], slot_2=["two"])
+# s.expect(s.complete_empty, s.slot_3)
 
 
 
-# Turn 2
+# # Turn 2
 
-s.push(slot_3=["ace"])
-s.expect(s.disambig, s.slot_1)
-s.push(slot_1=["king"])
-s.expect(s.confirm_unconfirmed, s.slot_1, s.slot_2, s.slot_3)
+# s.push(slot_3=["ace"])
+# s.expect(s.disambig, s.slot_1)
+# s.push(slot_1=["king"])
+# s.expect(s.confirm_unconfirmed, s.slot_1, s.slot_2, s.slot_3)
 
-s.expect(s.present, s.slot_1, s.slot_2, s.slot_3)
+# s.expect(s.present, s.slot_1, s.slot_2, s.slot_3)
 
-# Turn 3
-s.push()   # handle expectations even if there wasn't any input
-s.assign(slot_1=["seven"])
-print(s.slot_1.all_values)
+# # Turn 3
+# s.push()   # handle expectations even if there wasn't any input
+# s.assign(slot_1=["seven"])
+# print(s.slot_1.all_values)
 
 # print(s.slot_names)
 # print(s.slot_1.all_values, s.slot_2.all_values)
