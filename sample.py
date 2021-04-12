@@ -142,13 +142,12 @@ class State:
 
         for key, value in kwargs.items():
             for i in range(len(self.__dict__[key].value)):
-                if self.__dict__[key].value[i].value != value[0]:
-                    self.__dict__[key].value.pop(i)
-            if not self.__dict__[key].all_values:
-                if isinstance(value[0], Value):
-                    self.__dict__[key].value = value[0]
-                else:
-                    self.__dict__[key].value = self.__dict__[key + '_value_class'](value[0])
+                self.__dict__[key].value.pop()
+
+            if isinstance(value[0], Value):
+                self.__dict__[key].value = value[0]
+            else:
+                self.__dict__[key].value = self.__dict__[key + '_value_class'](value[0])
             print("assigned values:", key, '=', value[0])
 
     def confirm_slots(self, **kwargs):
@@ -245,7 +244,19 @@ class State:
         for slot_name in self.slot_names:
             self.__dict__[slot_name] = Slot()
 
+print("""
 
+Example 10
+
+""")
+state = State()
+state.new_slots(first_card=Cards, second_card=Cards)
+state.push(first_card='ace')
+state.expect(state.complete_empty, state.second_card)
+state.push(first_card='king')
+state.expect(state.disambig, state.first_card)
+
+state.push(first_card=['king'])
 # print("""
 
 # Example 1
