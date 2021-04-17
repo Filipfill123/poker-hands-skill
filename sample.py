@@ -143,7 +143,6 @@ class State:
         for key, value in kwargs.items():
             for i in range(len(self.__dict__[key].value)):
                 self.__dict__[key].value.pop()
-
             if isinstance(value[0], Value):
                 self.__dict__[key].value = value[0]
             else:

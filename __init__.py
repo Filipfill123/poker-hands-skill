@@ -2,7 +2,7 @@ from mycroft import MycroftSkill, intent_file_handler
 import sys
 sys.path.append('/opt/mycroft/skills/poker-hands-skill')
 #from StateRepresenation import StateRepresentation
-from sample import Slot, Value, State, Cards
+from StateRepresentation import Slot, Value, State, CardsEN
 import datetime
 
 
@@ -11,7 +11,8 @@ class PokerHands(MycroftSkill):
         self.skill_name = type(self).__name__
         
         self.STATE_REPRESENTATION = State()
-        self.STATE_REPRESENTATION.new_slots(first_card=Cards, second_card=Cards, task_state=Value)
+        self.STATE_REPRESENTATION.new_slots(first_card=CardsEN, second_card=CardsEN)
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.complete_empty, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
 
         
         MycroftSkill.__init__(self)
@@ -82,7 +83,8 @@ class PokerHands(MycroftSkill):
 
     @intent_file_handler('confirm.both.cards.intent')
     def handle_confirm_both_cards_intent(self, message):
-        # TODO confirming
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.confirm_unconfirmed, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.confirm_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
         time = datetime.datetime.now()
 
         if  self.STATE_REPRESENTATION.first_card.first_value ==  self.STATE_REPRESENTATION.second_card.first_value:
@@ -90,71 +92,94 @@ class PokerHands(MycroftSkill):
             # self.STATE_REPRESENTATION.state = Value(state='pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation() #TODO
+            
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.first_card.first_value} and {self.STATE_REPRESENTATION.second_card.first_value} is not a pair"
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'no_pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
-    
+            
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.present, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.emptying_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.empty_slots_fcn, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+
     @intent_file_handler('confirm.first.card.intent')
     def handle_confirm_first_card_intent(self, message):
         second_card = message.data.get('second_card')
-        self.STATE_REPRESENTATION.assign(second_card=second_card)
+        self.STATE_REPRESENTATION.push(second_card=second_card)
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.disambig, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(second_card=second_card)
+        
         time = datetime.datetime.now()
         if not self.STATE_REPRESENTATION.second_card.first_value:
             result = f"{second_card} is not a valid card. Please, say the second card again"
             self.speak_dialog('hands.poker', data={"result": result})
+            
         elif self.STATE_REPRESENTATION.first_card.first_value ==  self.STATE_REPRESENTATION.second_card.first_value:
             result = f"it is a pair of {self.STATE_REPRESENTATION.first_card.first_value}s"
             # self.STATE_REPRESENTATION.task_state.state = Value(state='pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation()
+            
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.first_card.first_value} and {self.STATE_REPRESENTATION.second_card.first_value} is not a pair"
-            self.STATE_REPRESENTATION.task_state.state = Value(state='no_pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'no_pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation()
+            
             self.speak_dialog('hands.poker', data={"result": result})
+
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.confirm_unconfirmed, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.confirm_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.present, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.emptying_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.empty_slots_fcn, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
 
     @intent_file_handler('confirm.second.card.intent')
     def handle_confirm_second_card_intent(self, message):
         first_card = message.data.get('first_card')
-        self.STATE_REPRESENTATION.assign(first_card=first_card)
+        self.STATE_REPRESENTATION.push(first_card=first_card)
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.disambig, self.STATE_REPRESENTATION.first_card)
+        self.STATE_REPRESENTATION.push(first_card=first_card)
         time = datetime.datetime.now()
+
         if not self.STATE_REPRESENTATION.first_card.first_value:
             result = f"{first_card} is not a valid card. Please, say the first card again"
             self.speak_dialog('hands.poker', data={"result": result})
-        elif self.STATE_REPRESENTATION.first_card.first_value ==  self.STATE_REPRESENTATION.second_card.first_value:
+        elif self.STATE_REPRESENTATION.first_card.first_value == self.STATE_REPRESENTATION.second_card.first_value:
             result = f"it is a pair of {self.STATE_REPRESENTATION.first_card.first_value}s"
             # self.STATE_REPRESENTATION.task_state.state = Value(state='pair')
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
         else:
             result = f"{self.STATE_REPRESENTATION.first_card.value_confidence} and {self.STATE_REPRESENTATION.second_card.first_value} is not a pair"
             self.STATE_REPRESENTATION.set_task_state("no_pair")
             with open("/home/polakf/DP/mycroft-core/skills/poker-hands-skill/logs/log.txt", "w+") as logging:
                 logging.write(f"{time}: {self.STATE_REPRESENTATION.first_card.first_value} + {self.STATE_REPRESENTATION.second_card.first_value} = 'no_pair' \n")
-            self.STATE_REPRESENTATION.delete_state_representation()
             self.speak_dialog('hands.poker', data={"result": result})
-    
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.confirm_unconfirmed, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.confirm_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.present, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.emptying_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.empty_slots_fcn, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+
     @intent_file_handler('confirm.no.cards.intent')
     def handle_confirm_no_cards_intent(self, message):
-        self.STATE_REPRESENTATION.delete_state_representation()
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.emptying_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.empty_slots_fcn, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
 
         self.speak_dialog('kill', data={"result":""})
 
     @intent_file_handler('choose.second.card.intent')
     def handle_choose_second_card_intent(self, message):
         card_value = message.data.get('card_value')
-        self.STATE_REPRESENTATION.push(second_card=[card_value])
+        self.STATE_REPRESENTATION.push(second_card=card_value)
         if not self.STATE_REPRESENTATION.first_card.first_value:
             result = f"You chose {card_value} for the second card but the first card is empty. What is the first card?"
             self.speak_dialog('hands.poker', data={"result":result})
@@ -167,7 +192,7 @@ class PokerHands(MycroftSkill):
     @intent_file_handler('choose.first.card.intent')
     def handle_choose_first_card_intent(self, message):
         card_value = message.data.get('card_value')
-        self.STATE_REPRESENTATION.push(first_card=[card_value])
+        self.STATE_REPRESENTATION.push(first_card=card_value)
         if not self.STATE_REPRESENTATION.second_card.first_value:
             result = f"You chose {card_value} for the first card but the second card is empty. What is the second card?"
             self.speak_dialog('hands.poker', data={"result":result})
@@ -187,7 +212,9 @@ class PokerHands(MycroftSkill):
             result = f"The first card was {self.STATE_REPRESENTATION.first_card.first_value}, the second card was empty"
         elif self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card was {self.STATE_REPRESENTATION.first_card.first_value}, the second card was {self.STATE_REPRESENTATION.second_card.first_value}"
-        self.STATE_REPRESENTATION.delete_state_representation()
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.emptying_slots, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push(self.STATE_REPRESENTATION.empty_slots_fcn, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
 
         self.speak_dialog('kill', data={"result": result})
 
@@ -201,7 +228,9 @@ class PokerHands(MycroftSkill):
             result = f"The first card is {self.STATE_REPRESENTATION.first_card.first_value}, the second card is empty"
         elif self.STATE_REPRESENTATION.first_card.first_value and self.STATE_REPRESENTATION.second_card.first_value:    
             result = f"The first card is {self.STATE_REPRESENTATION.first_card.first_value}, the second card is {self.STATE_REPRESENTATION.second_card.first_value}"
-
+        self.STATE_REPRESENTATION.push()
+        self.STATE_REPRESENTATION.expect(self.STATE_REPRESENTATION.present, self.STATE_REPRESENTATION.first_card, self.STATE_REPRESENTATION.second_card)
+        self.STATE_REPRESENTATION.push()
         self.speak_dialog('show', data={"result": result})
 
 def create_skill():
