@@ -280,6 +280,8 @@ class Slot:
         """
         self.__value = None
         self.__state = None
+        self.__first_value = None
+        self.__last_value = None
 
     @property
     def first_value(self):
